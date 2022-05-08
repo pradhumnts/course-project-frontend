@@ -1,12 +1,11 @@
 import React from 'react';
 import './App.css';
-import PersistentDrawerLeft from './components/Qbank'
-import { Link } from "react-router-dom";
+import Index from './routes/index'
 
 function App() {
   return (
     <React.Fragment>
-      <PersistentDrawerLeft />
+      <Index />
     </React.Fragment>
   );
 }

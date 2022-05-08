@@ -13,7 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItemText from '@mui/material/ListItemText';
-import data from '../mock/data'
+// import data from '../mock/data'
 import ListItemButton from '@mui/material/ListItemButton';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -27,7 +27,9 @@ import secondToHms from '../utils/secondsToHms'
 import TimeDialog from '../components/TimeDialog'
 import { Button } from '@mui/material';
 import ResultDialog from '../components/ResultDialog'
-import './qbank.css'
+import '../assets/css/qbank.css'
+import { useLocation, useNavigate } from 'react-router-dom'
+import ClipLoader from "react-spinners/ClipLoader";
 
 const drawerWidth = 240;
 
@@ -79,13 +81,22 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'space-between',
 }));
 
-export default function PersistentDrawerLeft() {
+export default function QBank() {
 
-    const theme = useTheme();
+    const {state} = useLocation();
+    const navigate = useNavigate();
+
+    let data = state
+
+    if (data === null){
+        data = ""
+    }
+
+    const theme = useTheme()
     const [open, setOpen] = useState(true);
-    const [currentQuestion, setCurrentQuestion] = useState(data[0])
+    const [currentQuestion, setCurrentQuestion] = useState(data[0]?.data[0])
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [selectedAnsCoice, setSelectedChoice] = useState(currentQuestion.answerChoiceList[0].choice)
+    const [selectedAnsCoice, setSelectedChoice] = useState("")
     const [answerValue, setAnswerValue] = useState("")
     const [helperText, setHelperText] = useState("")
     const [error, setError] = useState(false)
@@ -94,19 +105,33 @@ export default function PersistentDrawerLeft() {
     const [counter, setCounter] = useState(data.length * 60);
     const [openDialog, setOpenDialog] = useState(false)
     const [showResults, setShowResults] = useState(false)
-
+    const [loading, setLoading] = useState(true)
+    
     const handleRadioChange = (event) => {
         setAnswerValue(event.target.value)
     }
 
-  
-    // time spent, correct questions, incorrect, unanswerd questions
-
-    console.log(data, attemptedQuestions)
-
     React.useEffect(() => {
         console.log(attemptedQuestions);
     }, [attemptedQuestions]);
+
+    React.useEffect(() => {
+        const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
+
+        if(counter === 0) setOpenDialog(true) 
+        return () => clearInterval(timer);
+        
+      }, [counter]);
+    
+    
+    if (loading){
+        return (
+            <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
+                <Typography variant="h3" sx={{ mb:3 }}>Invalid URL</Typography>
+                <Button variant="outlined" onClick={() => navigate(-1)}>Go Back</Button>
+            </Box>
+        )
+    }
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -128,9 +153,11 @@ export default function PersistentDrawerLeft() {
     const handleDrawerClose = () => { setOpen(false) };
 
     const selectQuestion = (index) => {
-        setCurrentQuestion(data.find(x => x.sequenceId === index + 1))
+        let selectedQuestion = data.find(x => x.id === index + 1)
         
-        if(attemptedQuestions.find((ele) => ele.question === currentQuestion) === undefined){
+        setCurrentQuestion(selectedQuestion)
+        
+        if(attemptedQuestions.find((ele) => ele.question === selectedQuestion) === undefined){
             setShowSubmitButton(false)
             setError(false)
             setHelperText("")
@@ -145,14 +172,6 @@ export default function PersistentDrawerLeft() {
         setSelectedIndex(index);
         selectQuestion(index);
     };
-
-    React.useEffect(() => {
-        const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
-
-        if(counter === 0) setOpenDialog(true) 
-        return () => clearInterval(timer);
-        
-      }, [counter]);
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -205,8 +224,7 @@ export default function PersistentDrawerLeft() {
                 <Divider />
                 <List component="nav" sx={{ fontWeight: 'bold' }}  aria-label="main mailbox folders">
                     {data.map((text, index) => (
-                        <ListItemButton
-                           
+                        <ListItemButton 
                             key={index}
                             selected={selectedIndex === index}
                             onClick={(event) => handleListItemClick(event, index)}

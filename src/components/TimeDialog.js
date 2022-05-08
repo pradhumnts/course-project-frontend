@@ -5,6 +5,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { Link } from 'react-router-dom'
 
 export default function AlertDialog({ dialogOpen }) {
   const [open, setOpen] = React.useState(dialogOpen);
@@ -35,9 +36,11 @@ export default function AlertDialog({ dialogOpen }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>See results</Button>
+          <Link to="/">
           <Button onClick={handleClose}>
             Go to homepage
           </Button>
+          </Link>
         </DialogActions>
       </Dialog>
     </div>

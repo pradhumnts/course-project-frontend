@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Box, Typography } from '@mui/material';
+import { Link } from 'react-router-dom'
 
 export default function AlertDialog({ timeSpent, correct, incorrect, unanswerd }) {
   const [open, setOpen] = React.useState(true);
@@ -48,9 +49,11 @@ export default function AlertDialog({ timeSpent, correct, incorrect, unanswerd }
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} autoFocus>
-            Go To Homepage
-          </Button>
+          <Link to="/">
+            <Button onClick={handleClose} autoFocus>
+              Go To Homepage
+            </Button>
+          </Link>
         </DialogActions>
       </Dialog>
     </div>
