@@ -89,12 +89,17 @@ export default function QBank() {
     let data = state
 
     if (data === null){
-        data = ""
+        data = []
     }
+
+    React.useEffect(() => {
+        console.log(data);
+        setLoading(false)
+    }, [data])
 
     const theme = useTheme()
     const [open, setOpen] = useState(true);
-    const [currentQuestion, setCurrentQuestion] = useState(data[0]?.data[0])
+    const [currentQuestion, setCurrentQuestion] = useState(data == "" ? "" : data[0] )
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [selectedAnsCoice, setSelectedChoice] = useState("")
     const [answerValue, setAnswerValue] = useState("")
@@ -113,7 +118,7 @@ export default function QBank() {
 
     React.useEffect(() => {
         console.log(attemptedQuestions);
-    }, [attemptedQuestions]);
+    }, [attemptedQuestions])
 
     React.useEffect(() => {
         const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
@@ -124,12 +129,12 @@ export default function QBank() {
       }, [counter]);
     
     
+    
     if (loading){
         return (
-            <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-                <Typography variant="h3" sx={{ mb:3 }}>Invalid URL</Typography>
-                <Button variant="outlined" onClick={() => navigate(-1)}>Go Back</Button>
-            </Box>
+        <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <ClipLoader size={50} css={{ display: 'block', margin: "auto" }} color={"#123abc"} speedMultiplier={1.5} />
+        </Box>
         )
     }
 

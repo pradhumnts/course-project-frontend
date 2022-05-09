@@ -64,7 +64,7 @@ export default function BasicTabs() {
   useEffect(() => {
     const get_course_content = async () => {
       try{
-        const response = await fetch("yvens.pythonanywhere.com/courses/")
+        const response = await fetch("https://yvens.pythonanywhere.com/courses/")
         const data = await response.json()
         setCourseContent(data[0])
         setLoading(false)
@@ -142,15 +142,14 @@ export default function BasicTabs() {
 
   const submitHandler = async () => {
     
-    axios.post('yvens.pythonanywhere.com/courses/', checked)
+    axios.post('https://yvens.pythonanywhere.com/courses/', checked)
     .then(function (response) {
       console.log(response)
       navigate("/course/1/qbank", { state: response.data })
     })
     .catch(function (error) {
       console.log(error)
-    }) 
-    
+    })
   }
 
   if (loading){
