@@ -65,7 +65,7 @@ export default function BasicTabs() {
   useEffect(() => {
     const get_course_content = async () => {
       try{
-        const response = await fetch("http://127.0.0.1:8000/courses/")
+        const response = await fetch("http://pradhumnts.pythonanywhere.com/courses/")
         const data = await response.json()
         setCourseContent(data[0])
         setLoading(false)
@@ -146,7 +146,7 @@ export default function BasicTabs() {
 
   const submitHandler = async () => {
     
-    axios.post('http://127.0.0.1:8000/courses/', checked)
+    axios.post('http://pradhumnts.pythonanywhere.com/courses/', checked)
     .then(function (response) {
       console.log(response)
       navigate("/course/1/qbank", { state: response.data })
