@@ -56,6 +56,7 @@ function a11yProps(index) {
 }
 
 export default function BasicTabs() {
+
   const { id } = useParams()
   const [courseContent, setCourseContent] = useState({})
   const [loading, setLoading] = useState(true)
@@ -64,11 +65,11 @@ export default function BasicTabs() {
   useEffect(() => {
     const get_course_content = async () => {
       try{
-        const response = await fetch("https://yvens.pythonanywhere.com/courses/")
+        const response = await fetch("http://127.0.0.1:8000/courses/")
         const data = await response.json()
         setCourseContent(data[0])
         setLoading(false)
-        console.log(data[0])
+
       }catch(err){
         console.log(err)
       }
@@ -82,10 +83,10 @@ export default function BasicTabs() {
     subjects: [],
     system: [],
     topics: []
-  });
+  })
 
   useEffect(() => {
-    console.log(checked)
+    // console.log(checked)
   }, [checked])
 
   const handleChange = (event, newValue) => {
@@ -109,6 +110,9 @@ export default function BasicTabs() {
   }
 
   const handleSystemCheckboxChange = (event) => {
+
+    console.log(courseContent.sections.map(x => x.subject.find(y => y.system !== event.target.value)))
+
     if (event.target.checked) {
       setChecked({
         subjects: [...checked.subjects],
@@ -142,7 +146,7 @@ export default function BasicTabs() {
 
   const submitHandler = async () => {
     
-    axios.post('https://yvens.pythonanywhere.com/courses/', checked)
+    axios.post('http://127.0.0.1:8000/courses/', checked)
     .then(function (response) {
       console.log(response)
       navigate("/course/1/qbank", { state: response.data })

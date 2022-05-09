@@ -158,11 +158,12 @@ export default function QBank() {
     const handleDrawerClose = () => { setOpen(false) };
 
     const selectQuestion = (index) => {
-        let selectedQuestion = data.find(x => x.id === index + 1)
+
+        let selectedQuestion = data.find(x => data.indexOf(x) === index)
         
         setCurrentQuestion(selectedQuestion)
-        
-        if(attemptedQuestions.find((ele) => ele.question === selectedQuestion) === undefined){
+
+        if(!!attemptedQuestions.find((ele) => ele.question === selectedQuestion)){
             setShowSubmitButton(false)
             setError(false)
             setHelperText("")
@@ -171,6 +172,7 @@ export default function QBank() {
             setError(false)
             setHelperText("")
         }
+
     }
 
     const handleListItemClick = (event, index) => {
