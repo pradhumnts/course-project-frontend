@@ -13,7 +13,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItemText from '@mui/material/ListItemText';
-// import data from '../mock/data'
 import ListItemButton from '@mui/material/ListItemButton';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -28,8 +27,10 @@ import TimeDialog from '../components/TimeDialog'
 import { Button } from '@mui/material';
 import ResultDialog from '../components/ResultDialog'
 import '../assets/css/qbank.css'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import ClipLoader from "react-spinners/ClipLoader";
+import Tooltip from '@mui/material/Tooltip';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
 const drawerWidth = 240;
 
@@ -84,9 +85,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function QBank() {
 
     const {state} = useLocation();
-    const navigate = useNavigate();
-
-    let data = state
+    
+    let data = state.data
 
     if (data === null){
         data = []
@@ -103,15 +103,15 @@ export default function QBank() {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [selectedAnsCoice, setSelectedChoice] = useState("")
     const [answerValue, setAnswerValue] = useState("")
-    const [helperText, setHelperText] = useState("")
-    const [error, setError] = useState(false)
     const [showSubmitButton, setShowSubmitButton] = useState(true)
     const [attemptedQuestions, setAttemptedQuestions] = useState([])
     const [counter, setCounter] = useState(data.length * 60);
     const [openDialog, setOpenDialog] = useState(false)
     const [showResults, setShowResults] = useState(false)
     const [loading, setLoading] = useState(true)
-    
+    const [timeSpent, setTimeSpent] = useState(counter)
+    const [testComplete, setTestComplete] = useState(false)
+
     const handleRadioChange = (event) => {
         setAnswerValue(event.target.value)
     }
@@ -128,8 +128,6 @@ export default function QBank() {
         
       }, [counter]);
     
-    
-    
     if (loading){
         return (
         <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -143,14 +141,12 @@ export default function QBank() {
 
         setShowSubmitButton(false)
 
-        if (answerValue === currentQuestion.correctAnswer) {
+        if (parseInt(answerValue) === currentQuestion.correctAnswer) {
             setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: true}])
-            setHelperText("Correct Answer!")
         }else{
-            setError(true)
-            setHelperText("Wrong Answer!")
             setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: false}])
         }
+
     }
 
     const handleDrawerOpen = () => { setOpen(true) };
@@ -163,22 +159,49 @@ export default function QBank() {
         
         setCurrentQuestion(selectedQuestion)
 
-        if(!!attemptedQuestions.find((ele) => ele.question === selectedQuestion)){
-            setShowSubmitButton(false)
-            setError(false)
-            setHelperText("")
-        }else{
-            setShowSubmitButton(true)
-            setError(false)
-            setHelperText("")
-        }
+            if(!!attemptedQuestions.find((ele) => ele.question === selectedQuestion)){
+                setShowSubmitButton(false)
+            }else{
+                if(!testComplete){
+                    setShowSubmitButton(true)
+                }
+            }
 
     }
 
     const handleListItemClick = (event, index) => {
-        setSelectedIndex(index);
-        selectQuestion(index);
+        if(index >= 0 && index < data.length){
+            setSelectedIndex(index);
+            selectQuestion(index);
+        }
     };
+
+    const finshTestHandler = () => {
+
+        !testComplete && setTimeSpent(secondToHms((data.length * 60) - counter))
+        setShowResults(!showResults)
+        setTestComplete(true)
+        setShowSubmitButton(false)
+
+        if (answerValue === currentQuestion.correctAnswer) {
+            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: true}])
+        }else{
+            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: false}])
+        }
+
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+    
+    const previousQuestionHandler = () => {
+
+    }
+
+    const nextQuestionHandler = () => {
+        console.log(selectedIndex)
+    }
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -198,15 +221,72 @@ export default function QBank() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div">STEP2 CK QBank</Typography>
+                    <Typography variant="h6" noWrap component="div">STEP2 CK QBank <sup>{capitalizeFirstLetter(state.courseMode)} Mode</sup> </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>
-                    {counter < 3600 ? 
-                    <Typography variant="p" noWrap component="div">Block Time Remaining: {new Date(counter * 1000).toISOString().substr(14, 8)} </Typography>: 
-                    <Typography variant="p" noWrap component="div">Block Time Remaining: {new Date(counter * 1000).toISOString().substr(11, 8)} </Typography> }  
-                    <Button variant="contained" size="medium" onClick={() => setShowResults(!showResults) }>Finish Test</Button>
+                    {!testComplete ? 
+                      <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>
+                      {counter < 3600 ? 
+                      <Typography variant="p" noWrap component="div">Block Time Remaining: {new Date(counter * 1000).toISOString().substr(14, 8)} </Typography>: 
+                      <Typography variant="p" noWrap component="div">Block Time Remaining: {new Date(counter * 1000).toISOString().substr(11, 8)} </Typography> }  
+                      <Button variant="contained" size="medium" onClick={finshTestHandler}>Finish Test</Button>
+                      </Box>
+                    :
                     
+                    <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>          
+                    {timeSpent < 3600 ? 
+                    <Typography variant="p" noWrap component="div">Total Time Spent: {timeSpent} </Typography>: 
+                    <Typography variant="p" noWrap component="div">Total Time Spent: {timeSpent} </Typography> }  
+                    <Button variant="contained" size="medium" onClick={finshTestHandler}>See Results</Button>
                     </Box>
+
+                    }
+                
+                </Toolbar>
+            </AppBar>
+            <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }} open={open}>
+                <Toolbar sx={{ display: 'flex', justifyContent: 'center' }}>
+                   
+        
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <Tooltip title="Previous Question">
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={(event) => handleListItemClick(event, selectedIndex - 1)}
+                        edge="start"
+                        sx={{ mr: 2 }}
+                    >
+                        <ChevronLeftIcon />
+                    </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Next Question">
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={(event) => handleListItemClick(event, selectedIndex + 1)}
+                        edge="start"
+                        sx={{ mr: 2 }}
+                    >
+                        <ChevronRightIcon />
+                    </IconButton>
+                    </Tooltip>
+                    </Box>
+                   
+                    {/* <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>    
+                    <Tooltip title="Full Screen">
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={(event) => handleListItemClick(event, selectedIndex - 1)}
+                        edge="start"
+                        sx={{ mr: 2 }}
+                    >
+                        <FullscreenIcon />
+                    </IconButton>
+                    </Tooltip>
+
+                    </Box> */}
+                
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -246,14 +326,14 @@ export default function QBank() {
             <Main open={open}>
                 <DrawerHeader />
             
-            {showResults && 
-                <ResultDialog 
-                    timeSpent={secondToHms((data.length * 60) - counter)} 
-                    correct={attemptedQuestions.filter(e => e.answerCorrect == true).length} 
-                    incorrect={attemptedQuestions.filter(e => e.answerCorrect == false).length} 
-                    unanswerd={data.length - attemptedQuestions.length} 
-                /> 
-            }
+                {showResults && 
+                    <ResultDialog 
+                        timeSpent={timeSpent}
+                        correct={attemptedQuestions.filter(e => e.answerCorrect == true).length} 
+                        incorrect={attemptedQuestions.filter(e => e.answerCorrect == false).length} 
+                        unanswerd={data.length - attemptedQuestions.length} 
+                    /> 
+                }
 
                 <Card sx={{ mb: 5, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
                     <CardContent>
@@ -272,10 +352,13 @@ export default function QBank() {
                             >
                                 {currentQuestion.answerChoiceList.map((answer, index) =>
                                     <div>
-                                    {
-                                    attemptedQuestions.find((ele) => ele.question === currentQuestion) === undefined ?<FormControlLabel key={index} value={answer.choiceNumber} control={<Radio required={true} disabled={false} />} label={stripHtml(answer.choice)} /> : <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} />} label={stripHtml(answer.choice)}/>
+                                    {testComplete ? 
+                                    <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} />} label={stripHtml(answer.choice)}/>
+                                    :
+
+                                    attemptedQuestions.find((ele) => ele.question === currentQuestion) === undefined ? <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio required={true} disabled={false} />} label={stripHtml(answer.choice)} /> : <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} />} label={stripHtml(answer.choice)}/>
+                                        
                                     }
-                                    
                                     </div>
                                 )}
                             </RadioGroup>
@@ -283,15 +366,40 @@ export default function QBank() {
                     </div>
                     {showSubmitButton && <Button variant="outlined" type="submit" size="medium" sx={{ mt: 4 }}>Submit</Button>}
                 </form>
-                <Typography mt={3} variant="h6" color={error ? "red" : "green"}>{helperText}</Typography>
-                {attemptedQuestions.find((ele) => ele.question === currentQuestion) !== undefined && 
-                
-                <Card sx={{ mt: 5, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
-                    <CardContent>
-                        <Typography paragraph dangerouslySetInnerHTML={{ __html: currentQuestion.explanationText }}></Typography>
-                    </CardContent>
-                </Card>
+          
+                {state.courseMode === "test" && testComplete &&
+                <Box>
+                    {!!attemptedQuestions.find(x => x.question === currentQuestion) && 
+                    <Box>
+                    {attemptedQuestions.find(x => x.question === currentQuestion).answerCorrect ? <Typography mt={3} variant="h6" color={"green"}>Correct Answer</Typography> : <Typography mt={3} variant="h6" color={"red"}>Incorrect Answer</Typography>
+                    }
+                    </Box>
+                    }
+                   
+                    <Card sx={{ mt: 5, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
+                        <CardContent>
+                            <Typography paragraph dangerouslySetInnerHTML={{ __html: currentQuestion.explanationText }}></Typography>
+                        </CardContent>
+                    </Card>
+                </Box> 
                 }
+                {state.courseMode === "study" && !!attemptedQuestions.find((ele) => ele.question === currentQuestion) | testComplete &&
+                <Box>
+                    {!!attemptedQuestions.find(x => x.question === currentQuestion) && 
+                    <Box>
+                    {attemptedQuestions.find(x => x.question === currentQuestion).answerCorrect ? <Typography mt={3} variant="h6" color={"green"}>Correct Answer</Typography> : <Typography mt={3} variant="h6" color={"red"}>Incorrect Answer</Typography>
+                    }
+                    </Box>
+                    }
+                   
+                    <Card sx={{ mt: 5, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
+                        <CardContent>
+                            <Typography paragraph dangerouslySetInnerHTML={{ __html: currentQuestion.explanationText }}></Typography>
+                        </CardContent>
+                    </Card>
+                </Box> 
+                }
+               
             </Main>
         </Box>
     );

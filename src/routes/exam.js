@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { Grid } from '@mui/material'
+import { Grid, Divider } from '@mui/material'
 import TextField from '@mui/material/TextField';
 import NavBar from '../components/NavBar'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -20,6 +20,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Chip from '@mui/material/Chip';
 import axios from 'axios'
 import ClipLoader from "react-spinners/ClipLoader";
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 
 function TabPanel(props) {
 
@@ -61,6 +65,7 @@ export default function BasicTabs() {
   const [courseContent, setCourseContent] = useState({})
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate();
+  const [courseMode, setCourseMode] = useState("test")
 
   useEffect(() => {
     const get_course_content = async () => {
@@ -152,17 +157,21 @@ export default function BasicTabs() {
   }
 
   const submitHandler = async () => {
-    
+
     axios.post('https://pradhumnts.pythonanywhere.com/courses/', checked)
     .then(function (response) {
       console.log(response)
-      navigate("/course/1/qbank", { state: response.data })
+      navigate("/course/1/qbank", { state: {data: response.data, courseMode: courseMode } })
     })
     .catch(function (error) {
       console.log(error)
     })
   }
 
+  const courseModeHandler = (event) => {
+    setCourseMode(event.target.value)
+    console.log(courseMode)
+  }
   if (loading){
     return (
       <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -179,8 +188,22 @@ export default function BasicTabs() {
           <CardContent>
             <Typography variant="h4" sx={{ py:1, fontWeight: 700 }}>{courseContent.courseName}</Typography>
             <Typography paragraph mb={0}>{courseContent.description}</Typography>
+            <Divider sx={{ my:2 }} />
+            <FormControl>
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+                defaultValue="test"
+                onChange={courseModeHandler}
+              >
+                <FormControlLabel value="test" control={<Radio />} label="Test Mode" />
+                <FormControlLabel value="study" control={<Radio />} label="Study Mode" />
+              </RadioGroup>
+            </FormControl>
           </CardContent>
         </Card>
+      
         <Box sx={{ width: '100%', backgroundColor: "white", p: 1, borderRadius: 2, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
           <Tabs value={value} onChange={handleChange} aria-label="subjects tabs">
             {courseContent.sections.map((section, index) =>
