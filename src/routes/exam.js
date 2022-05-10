@@ -23,7 +23,6 @@ import ClipLoader from "react-spinners/ClipLoader";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 
 function TabPanel(props) {
 
@@ -66,6 +65,8 @@ export default function BasicTabs() {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate();
   const [courseMode, setCourseMode] = useState("test")
+  const [maxQuestion, setMaxQuestion] = useState(40)
+  const [secondsPerQuestion, setSecondsPerQuestion] = useState(60)
 
   useEffect(() => {
     const get_course_content = async () => {
@@ -161,7 +162,12 @@ export default function BasicTabs() {
     axios.post('https://pradhumnts.pythonanywhere.com/courses/', checked)
     .then(function (response) {
       console.log(response)
-      navigate("/course/1/qbank", { state: {data: response.data, courseMode: courseMode } })
+      navigate("/course/1/qbank", { state: {
+        data: response.data, 
+        courseMode: courseMode,
+        maxQuestions: maxQuestion,
+        secondsPerQuestion: secondsPerQuestion
+      } })
     })
     .catch(function (error) {
       console.log(error)
@@ -170,7 +176,6 @@ export default function BasicTabs() {
 
   const courseModeHandler = (event) => {
     setCourseMode(event.target.value)
-    console.log(courseMode)
   }
   if (loading){
     return (
@@ -178,6 +183,24 @@ export default function BasicTabs() {
         <ClipLoader size={50} css={{ display: 'block', margin: "auto" }} color={"#123abc"} speedMultiplier={1.5} />
       </Box>
     )
+  }
+
+  const maxQuestionsHandler = (event) => {
+    if(event.target.value < 0){
+      event.target.value = 0
+    }else if (event.target.value > 40){
+      event.target.value = 40
+    }
+    setMaxQuestion(event.target.value)
+  }
+  
+  const secondsPerQuestionHandler = (event) => {
+    if(event.target.value < 0){
+      event.target.value = 0
+    }else if (event.target.value > 360){
+      event.target.value = 360
+    }
+    setSecondsPerQuestion(event.target.value)
   }
 
   return (
@@ -271,8 +294,8 @@ export default function BasicTabs() {
               
               </Grid>
 
-              <Typography sx={{ fontWeight: 'bold' }} variant="p">Number Of Questions</Typography>
-
+              <Typography sx={{ fontWeight: 'bold' }} variant="p">Settings</Typography>
+              <Box sx={{ display: "flex", columnGap:3 }}>
               <Box my={2} sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
                 <TextField
                   id="filled-basic"
@@ -281,16 +304,28 @@ export default function BasicTabs() {
                   type="number"
                   defaultValue={40}
                   required={true}
-                  onChange={(event) =>
-                    event.target.value < 0
-                      ? (event.target.value = 0)
-                      : event.target.value
-                  }
+                  onChange={(event) => maxQuestionsHandler(event)}
                   InputLabelProps={{
                     shrink: true,
                   }}
                 />
-                <Typography variant="span">Max Questions allowed per block (40)</Typography>
+                <Typography variant="span">(Max: 40 questions)</Typography>
+              </Box>
+              <Box my={2} sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
+                <TextField
+                  id="filled-basic"
+                  variant="filled"
+                  label="Seconds Per Questions"
+                  type="number"
+                  defaultValue={60}
+                  required={true}
+                  onChange={(event) => secondsPerQuestionHandler(event)}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <Typography variant="span">(Max: 360 seconds)</Typography>
+              </Box>
               </Box>
               <Button sx={{ mt:3 }} variant="contained" disabled={checked.topics.length < 1} onClick={submitHandler}>Generate Test</Button>
             </TabPanel>

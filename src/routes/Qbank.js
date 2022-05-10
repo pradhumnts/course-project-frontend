@@ -96,7 +96,8 @@ export default function QBank() {
         console.log(data);
         setLoading(false)
     }, [data])
-
+    console.log(state.secondsPerQuestion)
+    
     const theme = useTheme()
     const [open, setOpen] = useState(true);
     const [currentQuestion, setCurrentQuestion] = useState(data == "" ? "" : data[0] )
@@ -105,7 +106,7 @@ export default function QBank() {
     const [answerValue, setAnswerValue] = useState("")
     const [showSubmitButton, setShowSubmitButton] = useState(true)
     const [attemptedQuestions, setAttemptedQuestions] = useState([])
-    const [counter, setCounter] = useState(data.length * 60);
+    const [counter, setCounter] = useState(data.length * state.secondsPerQuestion);
     const [openDialog, setOpenDialog] = useState(false)
     const [showResults, setShowResults] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -178,7 +179,7 @@ export default function QBank() {
 
     const finshTestHandler = () => {
 
-        !testComplete && setTimeSpent(secondToHms((data.length * 60) - counter))
+        !testComplete && setTimeSpent(secondToHms((data.length * state.secondsPerQuestion) - counter))
         setShowResults(!showResults)
         setTestComplete(true)
         setShowSubmitButton(false)
@@ -340,6 +341,7 @@ export default function QBank() {
                         <Typography paragraph dangerouslySetInnerHTML={{ __html: currentQuestion.questionText }}></Typography>
                     </CardContent>
                 </Card>
+                <Box>
                 <form onSubmit={handleSubmit}>
                     <div className="answers">
                         <FormControl>
@@ -366,7 +368,7 @@ export default function QBank() {
                     </div>
                     {showSubmitButton && <Button variant="outlined" type="submit" size="medium" sx={{ mt: 4 }}>Submit</Button>}
                 </form>
-          
+                </Box>
                 {state.courseMode === "test" && testComplete &&
                 <Box>
                     {!!attemptedQuestions.find(x => x.question === currentQuestion) && 
@@ -399,7 +401,7 @@ export default function QBank() {
                     </Card>
                 </Box> 
                 }
-               
+                <Box sx={{ mb: 8 }}></Box>
             </Main>
         </Box>
     );
