@@ -30,7 +30,6 @@ import '../assets/css/qbank.css'
 import { useLocation } from 'react-router-dom'
 import ClipLoader from "react-spinners/ClipLoader";
 import Tooltip from '@mui/material/Tooltip';
-import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
 const drawerWidth = 240;
 
@@ -96,8 +95,7 @@ export default function QBank() {
         console.log(data);
         setLoading(false)
     }, [data])
-    console.log(state.secondsPerQuestion)
-    
+
     const theme = useTheme()
     const [open, setOpen] = useState(true);
     const [currentQuestion, setCurrentQuestion] = useState(data == "" ? "" : data[0] )
@@ -112,14 +110,14 @@ export default function QBank() {
     const [loading, setLoading] = useState(true)
     const [timeSpent, setTimeSpent] = useState(counter)
     const [testComplete, setTestComplete] = useState(false)
+    const [radioReset, setRadioReset] = useState(false)
 
     const handleRadioChange = (event) => {
+        setRadioReset(false)
         setAnswerValue(event.target.value)
     }
 
-    React.useEffect(() => {
-        console.log(attemptedQuestions);
-    }, [attemptedQuestions])
+    React.useEffect(() => {}, [attemptedQuestions])
 
     React.useEffect(() => {
         const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
@@ -139,15 +137,15 @@ export default function QBank() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
+  
         setShowSubmitButton(false)
 
         if (parseInt(answerValue) === currentQuestion.correctAnswer) {
-            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: true}])
+            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: true, answerChoice: currentQuestion.answerChoiceList[parseInt(answerValue) - 1].choice, answerIndex: parseInt(answerValue)}])
         }else{
-            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: false}])
+            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: false, answerChoice: currentQuestion.answerChoiceList[parseInt(answerValue) - 1].choice, answerIndex: parseInt(answerValue)}])
         }
-
+    
     }
 
     const handleDrawerOpen = () => { setOpen(true) };
@@ -157,17 +155,16 @@ export default function QBank() {
     const selectQuestion = (index) => {
 
         let selectedQuestion = data.find(x => data.indexOf(x) === index)
-        
-        setCurrentQuestion(selectedQuestion)
 
+        setCurrentQuestion(selectedQuestion)
             if(!!attemptedQuestions.find((ele) => ele.question === selectedQuestion)){
                 setShowSubmitButton(false)
+                
             }else{
                 if(!testComplete){
                     setShowSubmitButton(true)
                 }
             }
-
     }
 
     const handleListItemClick = (event, index) => {
@@ -195,14 +192,7 @@ export default function QBank() {
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
       }
-    
-    const previousQuestionHandler = () => {
-
-    }
-
-    const nextQuestionHandler = () => {
-        console.log(selectedIndex)
-    }
+   
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -310,7 +300,7 @@ export default function QBank() {
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
-                <List component="nav" sx={{ fontWeight: 'bold' }}  aria-label="main mailbox folders">
+                <List component="nav" sx={{ fontWeight: 'bold' }}  aria-label="">
                     {data.map((text, index) => (
                         <ListItemButton 
                             key={index}
@@ -326,7 +316,6 @@ export default function QBank() {
 
             <Main open={open}>
                 <DrawerHeader />
-            
                 {showResults && 
                     <ResultDialog 
                         timeSpent={timeSpent}
@@ -335,7 +324,6 @@ export default function QBank() {
                         unanswerd={data.length - attemptedQuestions.length} 
                     /> 
                 }
-
                 <Card sx={{ mb: 5, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
                     <CardContent>
                         <Typography paragraph dangerouslySetInnerHTML={{ __html: currentQuestion.questionText }}></Typography>
@@ -348,18 +336,17 @@ export default function QBank() {
                             <FormLabel id="demo-radio-buttons-group-label">Answer Choices</FormLabel>
                             <RadioGroup
                                 aria-labelledby="demo-radio-buttons-group-label"
-                                defaultValue={selectedAnsCoice}
                                 name="radio-buttons-group"
                                 onChange={handleRadioChange}
                             >
                                 {currentQuestion.answerChoiceList.map((answer, index) =>
                                     <div>
+                                    {attemptedQuestions.find(e => e.question === currentQuestion) && console.log()}
                                     {testComplete ? 
-                                    <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} />} label={stripHtml(answer.choice)}/>
+                                    <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} />} label={stripHtml(answer.choice)} />
                                     :
-
-                                    attemptedQuestions.find((ele) => ele.question === currentQuestion) === undefined ? <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio required={true} disabled={false} />} label={stripHtml(answer.choice)} /> : <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} />} label={stripHtml(answer.choice)}/>
-                                        
+                                    attemptedQuestions.find((ele) => ele.question === currentQuestion) === undefined ? <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio required={true} disabled={false} />} label={stripHtml(answer.choice)} /> : 
+                                    <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} checked={answer.choice === attemptedQuestions.find(e => e.question === currentQuestion).answerChoice} />} label={stripHtml(answer.choice)}/>
                                     }
                                     </div>
                                 )}
