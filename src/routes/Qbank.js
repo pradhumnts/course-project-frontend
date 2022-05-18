@@ -100,7 +100,6 @@ export default function QBank() {
     const [open, setOpen] = useState(true);
     const [currentQuestion, setCurrentQuestion] = useState(data == "" ? "" : data[0] )
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [selectedAnsCoice, setSelectedChoice] = useState("")
     const [answerValue, setAnswerValue] = useState("")
     const [showSubmitButton, setShowSubmitButton] = useState(true)
     const [attemptedQuestions, setAttemptedQuestions] = useState([])

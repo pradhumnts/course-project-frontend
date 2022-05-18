@@ -1,12 +1,15 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import NavBar from '../components/NavBar'
-import { Box, Typography, TextField, Button, Grid } from '@mui/material'
+import { Box, Typography, TextField, Button } from '@mui/material'
 import {Link} from 'react-router-dom'
 import axios from 'axios'
 import Alert from '@mui/material/Alert';
-import AuthContext from '../contexts/auth-context'
+import useAuth from '../hooks/useAuth'
+import {useNavigate} from 'react-router-dom'
 
 const Register = () => {
+    
+    let navigate = useNavigate()
 
     const [enteredEmail, setEnteredEmail] = useState("")
     const [enteredPass, setEnteredPass] = useState("")
@@ -18,9 +21,7 @@ const Register = () => {
     const [passwordErrorMsg, setPasswordErrorMsg] = useState("")
     const [emailError, setEmailError] = useState(false)
     const [emailErrorMsg, setEmailErrorMsg] = useState("")
-    const [isLogin, setIsLogin] = useState("")
-
-    const authCtx = useContext(AuthContext)
+    const { login } = useAuth()
 
     const emailInputHandler = (event) => {
         setEnteredEmail(event.target.value)
@@ -30,15 +31,6 @@ const Register = () => {
     }
     const usernameInputHandler = (event) => {
         setEnteredUsername(event.target.value)
-    }
-  
-    const formSubmitHandler = (event) => {
-        event.preventDefault()
-
-        console.log(enteredEmail)
-        console.log(enteredPass)
-        console.log(enteredUsername)
-       
     }
 
     const handleRegister = async (e) => {
@@ -64,19 +56,22 @@ const Register = () => {
                 'Content-Type': 'application/json'
             },
           }).then(function (response) {
-                console.log(response.data)
-                authCtx.login(response.data.token)
+                login(enteredUsername, enteredPass)
+                navigate("/")
         }).catch(function (error) {
             console.log(error)
             if(!!error.response.data.non_field_errors){
                 setErrors([...error.response.data.non_field_errors])
+            }
+            else if(error.response.data.username){
+                setErrors([...error.response.data.username])
             }
             else{
                 setErrors(["Something Went Wrong!"])
             }
         })
         }catch(err) {
-          console.log(err, "Hello")
+          console.log(err)
         }
       }
   return (

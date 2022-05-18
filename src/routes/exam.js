@@ -71,7 +71,7 @@ export default function BasicTabs() {
   useEffect(() => {
     const get_course_content = async () => {
       try{
-        const response = await fetch("https://pradhumnts.pythonanywhere.com/courses/")
+        const response = await fetch("http://127.0.0.1:8000/courses/")
         const data = await response.json()
         setCourseContent(data[0])
         setLoading(false)
@@ -118,17 +118,19 @@ export default function BasicTabs() {
   const handleSystemCheckboxChange = (event) => {
     let selectedSystem = ""
 
-    courseContent.sections.map(x => x.subject.map(y => {
-
-      selectedSystem = y.system.find(z => z.system === event.target.value)
-    
+    courseContent.sections.map(x => 
+      x.subject.map(y => {
+      if(y.system.find(z => z.system === event.target.value)){
+        let topics = y.system.find(z => z.system === event.target.value)
+        selectedSystem = topics.topic.map(x => x.topicAttribute)
+      }
     }))
 
     if (event.target.checked) {
       setChecked({
         subjects: [...checked.subjects],
         system: [...checked.system, event.target.value],
-        topics: [...checked.topics, ...selectedSystem.topic]
+        topics: [...checked.topics, ...selectedSystem]
       })
     }else if(event.target.checked === false){
       setChecked({
@@ -137,11 +139,11 @@ export default function BasicTabs() {
         topics: [...checked.topics]
       })
     }
-    
+   
   }
 
   const handleTopicCheckboxChange = (event) => {
-    console.log(checked.topics.includes(event.target.value), event.target.checked)
+
     if (event.target.checked) {
       setChecked({
         subjects: [...checked.subjects],
@@ -155,11 +157,12 @@ export default function BasicTabs() {
         topics: checked.topics.filter(item => item !== event.target.value)
       })
     }
+    console.log(checked)
   }
 
   const submitHandler = async () => {
 
-    axios.post('https://pradhumnts.pythonanywhere.com/courses/', checked)
+    axios.post('http://127.0.0.1:8000/courses/', checked)
     .then(function (response) {
       console.log(response)
       navigate("/course/1/qbank", { state: {
@@ -264,13 +267,12 @@ export default function BasicTabs() {
                         aria-controls="panel1a-content"
                         id="panel1a-header"
                       >
-                      <Box sx={{ display: "flex", alignItems: "center", my:1, columnGap: 3 }}>
-                      {/* <FormControlLabel
+                      <Box sx={{ display: "flex", alignItems: "center", columnGap: 3 }}>
+                      <FormControlLabel
                         disabled={system.questions_length < 1 ? true : false || !checked.subjects.includes(subject.subject)}
                         label={system.system}
                         control={<Checkbox value={system.system} onChange={handleSystemCheckboxChange} />}
-                      /> */}
-                      <Typography>{system.system}</Typography>
+                      />
                       <Chip label={system.questions_length} color="primary" variant="outlined" size="small" />
                       </Box>
                       </AccordionSummary>
@@ -280,7 +282,7 @@ export default function BasicTabs() {
                               <FormControlLabel
                                 disabled={topic.questions_length < 1 || !checked.subjects.includes(subject.subject) ? true : false}
                                 label={topic.topicAttribute}
-                                control={<Checkbox value={topic.topicAttribute} checked={checked.topics.includes(topic.topicAttribute) ? true : false} onChange={handleTopicCheckboxChange} />}
+                                control={<Checkbox value={topic.topicAttribute} checked={checked.topics.includes(topic.topicAttribute)} onChange={handleTopicCheckboxChange} />}
                               />
                              
                             <Chip label={topic.questions_length} color="primary" variant="outlined" size="small" />

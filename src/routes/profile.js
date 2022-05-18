@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import NavBar from '../components/NavBar'
 import useAuth from '../hooks/useAuth';
 import { TextField } from '@mui/material'
@@ -8,8 +8,8 @@ const Profile = () => {
 
     const [firstName, setFirstName] = useState(user.first_name)
     const [lastName, setLastName] = useState(user.last_name)
-    const [username, setUsername] = useState(user.username)
     const [email, setEmail] = useState(user.email)
+    const [username, setUsername] = useState(user.username)
 
     const fNameInputHandler = (event) => {
         setFirstName(event.target.value)
@@ -22,6 +22,23 @@ const Profile = () => {
     const emailInputHandler = (event) => {
         setEmail(event.target.value)
     }
+
+    // useEffect(() => {
+    //     const loadUser = async () => {
+    //         let fName = await user.first_name
+    //         let lName = await user.last_name
+    //         let email = await user.email
+    //         let username = await user.username
+
+    //         setFirstName(fName)
+    //         setLastName(lName)
+    //         setEmail(email)
+    //         setUsername(username)
+    //     }
+
+    //     loadUser()
+
+    // }, [user])
 
     return (
         <div>
@@ -43,9 +60,9 @@ const Profile = () => {
                         <div className="row align-items-center mt-4">
                             <div className="col">
                                 <h3 className="mb-0">
-                                    {user.first_name ? <span> <b>{user.first_name}</b> {user.last_name} </span> : <b>{user.username}</b>}
+                                    {firstName ? <span> <b>{lastName}</b> {lastName} </span> : <b>{username}</b>}
                                 </h3>
-                                {user.first_name && <span className="text-muted d-block">{user.first_name} {user.last_name}</span>}    
+                                {firstName && <span className="text-muted d-block">{firstName} {lastName}</span>}    
                             </div>
                         </div>
                     </div>
@@ -119,27 +136,7 @@ const Profile = () => {
                                             <button type="button" className="btn btn-danger" id="delete" >Delete your account</button>
                                         </div>
                                     </div>
-                                    <div className="modal fade" id="modal_account_deactivate" tabindex="-1" role="dialog" aria-labelledby="modal_account_deactivate" aria-hidden="true">
-                                        <div className="modal-dialog modal-dialog-centered" role="document">
-                                            <div className="modal-content">
-                                                <div className="modal-body">
-                                                    <div className="pt-5 text-center">
-                                                        <div className="icon text-danger">
-                                                            <i data-feather="user-x" className=""></i>
-                                                        </div>
-                                                        <h4 className="h5 mt-5 mb-3">Extremely important</h4>
-                                                        <p>
-                                                            We will immediately delete all of your personal data from our database. This action can not be undone. Are you sure you want to do this?
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="modal-footer">
-                                                    <button type="button" className="btn btn-sm btn-link text-danger btn-zoom--hover font-weight-600">Delete</button>
-                                                    <button type="button" className="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                 
                                 </div>
                             </div>
                         </div>
