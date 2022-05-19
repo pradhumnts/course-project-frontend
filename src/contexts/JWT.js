@@ -74,7 +74,7 @@ function AuthProvider({ children }) {
         if (accessToken) {
             setSession(accessToken);
 
-          const response = await axios.get('http://127.0.0.1:8000/current_user/', {
+          const response = await axios.get('https://pradhumnts.pythonanywhere.com/current_user/', {
               headers: {
                   Authorization: `JWT ${accessToken}`,
               }
@@ -115,7 +115,7 @@ function AuthProvider({ children }) {
   }, []);
 
   const login = async (username, password) => {
-    const response = await axios.post('http://127.0.0.1:8000/token-auth/', {
+    const response = await axios.post('https://pradhumnts.pythonanywhere.com/token-auth/', {
       username,
       password,
     });
@@ -131,7 +131,7 @@ function AuthProvider({ children }) {
   };
 
   const register = async (username, email, password, firstName, lastName) => {
-    const response = await axios.post('http://127.0.0.1:8000/users/', {
+    const response = await axios.post('https://pradhumnts.pythonanywhere.com/users/', {
         username,
         email,
         password,
