@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import NavBar from '../components/NavBar'
 import useAuth from '../hooks/useAuth';
 import { TextField, Button } from '@mui/material'
@@ -6,21 +6,20 @@ import { TextField, Button } from '@mui/material'
 const Profile = () => {
     const { user } = useAuth()
 
-    const [firstName, setFirstName] = useState(user.first_name)
-    const [lastName, setLastName] = useState(user.last_name)
-    const [email, setEmail] = useState(user.email)
-    const [username, setUsername] = useState(user.username)
+    // const [firstName, setFirstName] = useState(user.first_name)
+    // const [lastName, setLastName] = useState(user.last_name)
+    // const [email, setEmail] = useState(user.email)
 
     const fNameInputHandler = (event) => {
-        setFirstName(event.target.value)
+        // setFirstName(event.target.value)
     }
 
     const lNameInputHandler = (event) => {
-        setLastName(event.target.value)
+        // setLastName(event.target.value)
     }
 
     const emailInputHandler = (event) => {
-        setEmail(event.target.value)
+        // setEmail(event.target.value)
     }
 
     return (
@@ -43,9 +42,9 @@ const Profile = () => {
                         <div className="row align-items-center mt-4">
                             <div className="col">
                                 <h3 className="mb-0">
-                                    {firstName ? <span> <b>{lastName}</b> {lastName} </span> : <b>{username}</b>}
+                                    {user.first_name ? <span> <b>{user.first_name}</b> {user.last_name} </span> : <b>{user.username}</b>}
                                 </h3>
-                                {firstName && <span className="text-muted d-block">{firstName} {lastName}</span>}    
+                                {user.first_name && <span className="text-muted d-block">{user.first_name} {user.last_name}</span>}    
                             </div>
                         </div>
                     </div>
@@ -69,7 +68,6 @@ const Profile = () => {
                                                     label="First Name"
                                                     variant="outlined"
                                                     fullWidth
-                                                    defaultValue={firstName}
                                                     onChange={fNameInputHandler}
                                                 />
                                             </div>
@@ -80,7 +78,6 @@ const Profile = () => {
                                                     label="Last Name"
                                                     variant="outlined"
                                                     fullWidth
-                                                    defaultValue={lastName}
                                                     onChange={lNameInputHandler}
                                                 />
                                             </div>
@@ -94,7 +91,6 @@ const Profile = () => {
                                                     label="Email"
                                                     variant="outlined"
                                                     fullWidth
-                                                    defaultValue={email}
                                                     onChange={emailInputHandler}
                                                 />
                                             </div>

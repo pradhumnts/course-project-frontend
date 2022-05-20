@@ -92,14 +92,17 @@ export default function QBank() {
     const { state } = useLocation();
 
     let data;
+    let secondsPerQuestion;
 
     if(state === null){
         data = []
     }else{
         data = state.data
+        secondsPerQuestion = state.secondsPerQuestion
     }
-  
+
     React.useEffect(() => {
+        
         setLoading(false)
     }, [data])
 
@@ -109,7 +112,7 @@ export default function QBank() {
     const [answerValue, setAnswerValue] = useState("")
     const [showSubmitButton, setShowSubmitButton] = useState(true)
     const [attemptedQuestions, setAttemptedQuestions] = useState([])
-    const [counter, setCounter] = useState(data === [] ? data.length * state.secondsPerQuestion : 0);
+    const [counter, setCounter] = useState(data === [] ? 0 : data.length * secondsPerQuestion);
     const [openDialog, setOpenDialog] = useState(false)
     const [showResults, setShowResults] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -137,7 +140,7 @@ export default function QBank() {
                 <NavBar />
                 <Box sx={{ display: "flex", justifyContent: "center", my: 25, flexDirection: "column", alignItems: "center" }}>
                     <Typography variant="h2">Internal Server Error!</Typography>
-                    <Button variant="outlined" sx={{ my: 4 }}><Link to="/">See Courses</Link></Button>
+                    <Link to="/"><Button variant="outlined" sx={{ my: 4 }}>See Courses</Button></Link>
                 </Box>
             </Box>
         )

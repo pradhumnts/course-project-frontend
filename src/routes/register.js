@@ -24,8 +24,7 @@ const Register = () => {
     const [usernameErrorMsg, setUsernameErrorMsg] = useState("")
     const [passwordError, setPasswordError] = useState(false)
     const [passwordErrorMsg, setPasswordErrorMsg] = useState("")
-    const [emailError, setEmailError] = useState(false)
-    const [emailErrorMsg, setEmailErrorMsg] = useState("")
+
     const { register } = useAuth()
 
     const emailInputHandler = (event) => {
@@ -41,7 +40,7 @@ const Register = () => {
     const handleRegister = async (e) => {
         e.preventDefault()
 
-        if (enteredUsername == ""){
+        if (enteredUsername === ""){
             setUsernameError(true)
             setUsernameErrorMsg("Username can not be empty!")
         }
@@ -99,8 +98,7 @@ const Register = () => {
                     label="Email"
                     variant="outlined"
                     fullWidth
-                    error={emailError}
-                    helperText={emailErrorMsg}
+                   
                     onChange={emailInputHandler}
                 />
                 <TextField

@@ -49,7 +49,8 @@ const UserCourses = () => {
 
         }
         get_user_courses()
-    }, [])
+    }, [courses, logout, navigate])
+
     if (loading){
         return (
         <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
