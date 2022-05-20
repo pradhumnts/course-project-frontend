@@ -5,6 +5,7 @@ import { Card, Button, Typography, Box, Stack } from '@mui/material';
 // components
 import Label from '../../components/Label';
 import Iconify from '../../components/Iconify';
+import { Link } from 'react-router-dom'
 
 // ----------------------------------------------------------------------
 
@@ -106,9 +107,11 @@ export default function PricingPlanCard({ card, index }) {
         ))}
       </Stack>
 
-      <Button fullWidth size="large" variant="contained" disabled={index === 0}>
+     <Link to="/payment" style={{ width: "100%" }}>
+     <Button fullWidth size="large" variant="contained" disabled={index === 0}>
         {labelAction}
       </Button>
+      </Link>
     </RootStyle>
   );
 }

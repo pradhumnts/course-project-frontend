@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom'
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { Button, Typography } from '@mui/material';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -69,8 +70,9 @@ const Index = () => {
                         <div className="card hover-translate-y-n3 hover-shadow-lg overflow-hidden">  
                             <div className="card-body py-4">
                                 <small className="d-block text-sm mb-2">{course.createdAt}</small>
-                                <Link to={`/course/${course.id}`} className="h5 stretched-link lh-150">{course.name}</Link>
-                                <p className="mt-3 mb-0 lh-170">{course.description}</p>
+                                <Typography variant="h4">{course.name}</Typography>
+                                <p className="mt-2 mb-0 lh-170">{course.description}</p>
+                               <Link to="/payment"><Button variant="outlined" sx={{ mt:2, width: "100%" }}>Enroll Now</Button></Link>
                             </div>
                             <div class="card-footer border-0 delimiter-top">
                                     <div class="row align-items-center">

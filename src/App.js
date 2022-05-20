@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import './App.css';
 import Index from './routes/index'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import Profile from './routes/profile';
 import Login from './routes/login';
 import Register from './routes/register';
 import UserCourses from './routes/user-courses'
+import Payment from './routes/payment';
 import { AuthProvider } from './contexts/JWT'
 import useAuth from './hooks/useAuth';
 import ThemeProvider from './theme';
@@ -34,6 +35,7 @@ function App() {
                 </>
               )
               }
+              <Route path="payment/" element={<Payment />} />
               <Route path="user/courses/" element={<UserCourses />} />
               <Route path="course/:id" element={<Exam />} />
               <Route path="course/:id/qbank" element={<QBank />} />
