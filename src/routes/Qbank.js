@@ -27,14 +27,14 @@ import TimeDialog from '../components/TimeDialog'
 import { Button } from '@mui/material';
 import ResultDialog from '../components/ResultDialog'
 import '../assets/css/qbank.css'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import ClipLoader from "react-spinners/ClipLoader";
 import Tooltip from '@mui/material/Tooltip';
-
-const drawerWidth = 240;
+import useResponsive from '../hooks/useResponsive';
+import NavBar from '../components/NavBar'
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
+    ({ theme, open, drawerWidth, isDesktop }) => ({
         flexGrow: 1,
         padding: theme.spacing(3),
         transition: theme.transitions.create('margin', {
@@ -44,7 +44,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
         backgroundColor: "rgba(25, 118, 210, 0.08)",
         minHeight: "100vh",
         height: "100%",
-        marginLeft: `-${drawerWidth}px`,
+        marginLeft: isDesktop ? `-${drawerWidth}px` : `-${drawerWidth}`,
         ...(open && {
             transition: theme.transitions.create('margin', {
                 easing: theme.transitions.easing.easeOut,
@@ -57,14 +57,14 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
+})(({ theme, open, drawerWidth }) => ({
     transition: theme.transitions.create(['margin', 'width'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
     }),
     ...(open && {
         width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
+        marginLeft: `${drawerWidth}`,
         transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
@@ -83,39 +83,43 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function QBank() {
 
-    const {state} = useLocation();
-    
-    let data = state.data
+    const theme = useTheme()
 
-    if (data === null){
+    const isDesktop = useResponsive('up', 'sm');
+
+    const drawerWidth = isDesktop ? 240 : "100%";
+
+    const { state } = useLocation();
+
+    let data;
+
+    if(state === null){
         data = []
+    }else{
+        data = state.data
     }
-
+  
     React.useEffect(() => {
-        console.log(data);
         setLoading(false)
     }, [data])
 
-    const theme = useTheme()
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(isDesktop ? true : false);
     const [currentQuestion, setCurrentQuestion] = useState(data == "" ? "" : data[0] )
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [answerValue, setAnswerValue] = useState("")
     const [showSubmitButton, setShowSubmitButton] = useState(true)
     const [attemptedQuestions, setAttemptedQuestions] = useState([])
-    const [counter, setCounter] = useState(data.length * state.secondsPerQuestion);
+    const [counter, setCounter] = useState(data === [] ? data.length * state.secondsPerQuestion : 0);
     const [openDialog, setOpenDialog] = useState(false)
     const [showResults, setShowResults] = useState(false)
     const [loading, setLoading] = useState(true)
     const [timeSpent, setTimeSpent] = useState(counter)
     const [testComplete, setTestComplete] = useState(false)
-    const [radioReset, setRadioReset] = useState(false)
-
+  
     const handleRadioChange = (event) => {
-        setRadioReset(false)
         setAnswerValue(event.target.value)
     }
-
+   
     React.useEffect(() => {}, [attemptedQuestions])
 
     React.useEffect(() => {
@@ -126,14 +130,27 @@ export default function QBank() {
         
       }, [counter]);
     
-    if (loading){
+     
+    if(data.length < 1){
         return (
-        <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <ClipLoader size={50} css={{ display: 'block', margin: "auto" }} color={"#123abc"} speedMultiplier={1.5} />
-        </Box>
+            <Box>
+                <NavBar />
+                <Box sx={{ display: "flex", justifyContent: "center", my: 25, flexDirection: "column", alignItems: "center" }}>
+                    <Typography variant="h2">Internal Server Error!</Typography>
+                    <Button variant="outlined" sx={{ my: 4 }}><Link to="/">See Courses</Link></Button>
+                </Box>
+            </Box>
         )
     }
 
+    if (loading){
+        return (
+        <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <ClipLoader size={50} css={{ display: 'block', margin: "auto" }} color={theme.palette.primary.main} speedMultiplier={1.5} />
+        </Box>
+        )
+    }
+   
     const handleSubmit = (event) => {
         event.preventDefault();
   
@@ -152,7 +169,7 @@ export default function QBank() {
     const handleDrawerClose = () => { setOpen(false) };
 
     const selectQuestion = (index) => {
-
+        
         let selectedQuestion = data.find(x => data.indexOf(x) === index)
 
         setCurrentQuestion(selectedQuestion)
@@ -164,6 +181,9 @@ export default function QBank() {
                     setShowSubmitButton(true)
                 }
             }
+        if(!isDesktop){
+            setOpen(false)
+        }
     }
 
     const handleListItemClick = (event, index) => {
@@ -198,8 +218,8 @@ export default function QBank() {
             <CssBaseline />
 
             {openDialog &&  <TimeDialog dialogOpen={true} />}
-
-            <AppBar position="fixed" open={open}>
+           
+            <AppBar position="fixed" open={open} drawerWidth={drawerWidth}>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center'}}>
                     <IconButton
@@ -213,6 +233,8 @@ export default function QBank() {
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">STEP2 CK QBank <sup>{capitalizeFirstLetter(state.courseMode)} Mode</sup> </Typography>
                     </Box>
+                    {isDesktop &&
+                    <Box>
                     {!testComplete ? 
                       <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>
                       {counter < 3600 ? 
@@ -230,10 +252,13 @@ export default function QBank() {
                     </Box>
 
                     }
+                    </Box>
+                    }
+                    
                 
                 </Toolbar>
             </AppBar>
-            <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }} open={open}>
+            <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }} open={open} drawerWidth={drawerWidth}>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'center' }}>
                    
         
@@ -261,21 +286,29 @@ export default function QBank() {
                     </IconButton>
                     </Tooltip>
                     </Box>
-                   
-                    {/* <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>    
-                    <Tooltip title="Full Screen">
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={(event) => handleListItemClick(event, selectedIndex - 1)}
-                        edge="start"
-                        sx={{ mr: 2 }}
-                    >
-                        <FullscreenIcon />
-                    </IconButton>
-                    </Tooltip>
+                    {!isDesktop &&
+                    <Box>
+                    {!testComplete ? 
+                      <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>
+                      {counter < 3600 ? 
+                      <Typography variant="p" noWrap component="div">Time Remaining: {new Date(counter * 1000).toISOString().substr(14, 8)} </Typography>: 
+                      <Typography variant="p" noWrap component="div">Time Remaining: {new Date(counter * 1000).toISOString().substr(11, 8)} </Typography> }  
+                      <Button variant="contained" size="medium" onClick={finshTestHandler}>Finish Test</Button>
+                      </Box>
+                    :
+                    
+                    <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>          
+                    {timeSpent < 3600 ? 
+                    <Typography variant="p" noWrap component="div">Total Time Spent: {timeSpent} </Typography>: 
+                    <Typography variant="p" noWrap component="div">Total Time Spent: {timeSpent} </Typography> }  
+                    <Button variant="contained" size="medium" onClick={finshTestHandler}>See Results</Button>
+                    </Box>
 
-                    </Box> */}
+                    }
+                        </Box>
+                    
+                    }
+                   
                 
                 </Toolbar>
             </AppBar>
@@ -313,7 +346,7 @@ export default function QBank() {
 
             </Drawer>
 
-            <Main open={open}>
+            <Main open={open} drawerWidth={drawerWidth} isDesktop={isDesktop}>
                 <DrawerHeader />
                 {showResults && 
                     <ResultDialog 

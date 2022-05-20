@@ -10,8 +10,12 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import {Link} from 'react-router-dom'
 import useAuth from '../hooks/useAuth';
+import { useTheme } from '@mui/material/styles';
 
 const ResponsiveAppBar = () => {
+
+  const theme = useTheme()
+
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
   const { isAuthenticated, logout, user } = useAuth()
@@ -36,7 +40,7 @@ const ResponsiveAppBar = () => {
             variant="h6"
             noWrap
             component="div"
-            sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+            sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, flexGrow: 0 }}
           >
             QBank
           </Typography>
@@ -67,14 +71,14 @@ const ResponsiveAppBar = () => {
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{
-                display: { xs: 'block', md: 'none' },
+                display: { xs: 'block', md: 'none'},
               }}
             >
-              
+
               <Link to="/">
                 <Button
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
+                  sx={{ color: theme.palette.text.primary, display: 'block', width: "100%", textAlign:"left", px:2 }}
                 >
                   Courses
                 </Button>
@@ -82,7 +86,7 @@ const ResponsiveAppBar = () => {
               <Link to="/categories">
                 <Button
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
+                  sx={{ color: theme.palette.text.primary, display: 'block', width: "100%", textAlign:"left", px:2 }}
                 >
                   Categories
                 </Button>
@@ -90,7 +94,7 @@ const ResponsiveAppBar = () => {
               <Link to="/pricing">
                 <Button
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
+                  sx={{ color: theme.palette.text.primary, display: 'block', width: "100%", textAlign:"left", px:2 }}
                 >
                   Pricing
                 </Button>
@@ -139,6 +143,14 @@ const ResponsiveAppBar = () => {
             
               {isAuthenticated ?
               <Box sx={{ display: 'flex', }}>
+              <Link to="/user/courses/">
+                <Button
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  My Courses
+                </Button>
+              </Link>
               <Link to="/profile">
                 <Button
                   onClick={handleCloseNavMenu}

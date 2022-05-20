@@ -2,13 +2,18 @@ import React, { useState } from 'react'
 import NavBar from '../components/NavBar'
 import { Box, Typography, TextField, Button } from '@mui/material'
 import {Link} from 'react-router-dom'
-import axios from 'axios'
 import Alert from '@mui/material/Alert';
 import useAuth from '../hooks/useAuth'
 import {useNavigate} from 'react-router-dom'
+import useResponsive from '../hooks/useResponsive';
+import { useTheme } from '@mui/material'
 
 const Register = () => {
-    
+
+    const theme = useTheme()
+
+    const isDesktop = useResponsive('up', 'sm');
+
     let navigate = useNavigate()
 
     const [enteredEmail, setEnteredEmail] = useState("")
@@ -21,7 +26,7 @@ const Register = () => {
     const [passwordErrorMsg, setPasswordErrorMsg] = useState("")
     const [emailError, setEmailError] = useState(false)
     const [emailErrorMsg, setEmailErrorMsg] = useState("")
-    const { login } = useAuth()
+    const { register } = useAuth()
 
     const emailInputHandler = (event) => {
         setEnteredEmail(event.target.value)
@@ -45,34 +50,22 @@ const Register = () => {
             setPasswordErrorMsg("Password must be at least 6 characters")
         }
 
-        try{
-          const data = {
-            username: enteredUsername,
-            email: enteredEmail,
-            password: enteredPass,
-          }
-          axios.post('http://127.0.0.1:8000/users/', data, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-          }).then(function (response) {
-                login(enteredUsername, enteredPass)
-                navigate("/")
-        }).catch(function (error) {
+        try {
+            await register(enteredUsername, enteredPass, enteredEmail)
+            navigate("/", {state: "Successfully Registered!"})
+
+        } catch (error) {
             console.log(error)
             if(!!error.response.data.non_field_errors){
-                setErrors([...error.response.data.non_field_errors])
-            }
-            else if(error.response.data.username){
-                setErrors([...error.response.data.username])
-            }
-            else{
-                setErrors(["Something Went Wrong!"])
-            }
-        })
-        }catch(err) {
-          console.log(err)
+                    setErrors([...error.response.data.non_field_errors])
+                }
+                else if(!!error.response.data.username){
+                    setErrors([...error.response.data.username])
+                }else{
+                    setErrors(["Something Went Wrong!"])
+                }
         }
+       
       }
   return (
     <Box>
@@ -87,7 +80,7 @@ const Register = () => {
                     )}
                 </Box>
             }
-            <Box sx={{ my:6, width: '25%' }}>
+            <Box sx={{ my:6, width: isDesktop ? '25%' : "75%" }}>
                 <form onSubmit={handleRegister}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: 4, width: '100%', }}>
                 <TextField
@@ -124,7 +117,7 @@ const Register = () => {
                 </Box>
                 </form>
             </Box>
-            <Typography variant="p" component="p">Already have an account? <Link to="/login">Log in</Link>.</Typography>
+            <Typography variant="p" component="p">Already have an account? <Link to="/login"><Typography variant="span" sx={{ color: theme.palette.primary.main }}>Log in</Typography></Link>.</Typography>
         </Box>
     </Box>
   )

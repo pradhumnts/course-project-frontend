@@ -120,8 +120,9 @@ function AuthProvider({ children }) {
       password,
     });
     const { token, user } = response.data;
-    console.log(response)
+
     setSession(token);
+
     dispatch({
       type: 'LOGIN',
       payload: {
@@ -130,18 +131,22 @@ function AuthProvider({ children }) {
     });
   };
 
-  const register = async (username, email, password, firstName, lastName) => {
+  const register = async (username, password, email, firstName, lastName) => {
     const response = await axios.post('https://pradhumnts.pythonanywhere.com/users/', {
         username,
-        email,
         password,
+        email,
         firstName,
         lastName,
     })
-    const { token, user } = response.data;
 
-    window.localStorage.setItem('accessToken', token);
-
+    const { token } = response.data;
+    setSession(token)
+    
+    // deleting token from response object
+    delete response.data.token
+    const user = response.data
+    
     dispatch({
       type: 'REGISTER',
       payload: {

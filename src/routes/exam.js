@@ -23,6 +23,8 @@ import ClipLoader from "react-spinners/ClipLoader";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
+import useResponsive from '../hooks/useResponsive';
+import { useTheme } from '@mui/material'
 
 function TabPanel(props) {
 
@@ -59,6 +61,9 @@ function a11yProps(index) {
 }
 
 export default function BasicTabs() {
+  const isDesktop = useResponsive('up', 'sm');
+  
+  const theme = useTheme()
 
   const { id } = useParams()
   const [courseContent, setCourseContent] = useState({})
@@ -71,8 +76,8 @@ export default function BasicTabs() {
   useEffect(() => {
     const get_course_content = async () => {
       try{
-        const response = await fetch("https://pradhumnts.pythonanywhere.com/courses/")
-        const data = await response.json()
+        const response = await axios.get("https://pradhumnts.pythonanywhere.com/courses/")
+        const data = response.data
         setCourseContent(data[0])
         setLoading(false)
 
@@ -183,7 +188,7 @@ export default function BasicTabs() {
   if (loading){
     return (
       <Box sx={{ height: "100vh", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <ClipLoader size={50} css={{ display: 'block', margin: "auto" }} color={"#123abc"} speedMultiplier={1.5} />
+        <ClipLoader size={50} css={{ display: 'block', margin: "auto" }} color={theme.palette.primary.main} speedMultiplier={1.5} />
       </Box>
     )
   }
@@ -206,11 +211,12 @@ export default function BasicTabs() {
     setSecondsPerQuestion(event.target.value)
   }
 
+
   return (
     <Box>
       <NavBar />
-      <Box sx={{ p: 5, minHeight: "100vh", height: "100%", backgroundColor: "rgba(25, 118, 210, 0.08)", }}>
-        <Card sx={{ mb: 5, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
+      <Box sx={{ p: isDesktop ? 5 : 2, minHeight: "100vh", height: "100%", backgroundColor: "rgba(25, 118, 210, 0.08)", }}>
+        <Card sx={{ mb: 3, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
           <CardContent>
             <Typography variant="h4" sx={{ py:1, fontWeight: 700 }}>{courseContent.courseName}</Typography>
             <Typography paragraph mb={0}>{courseContent.description}</Typography>
@@ -229,8 +235,8 @@ export default function BasicTabs() {
             </FormControl>
           </CardContent>
         </Card>
-      
-        <Box sx={{ width: '100%', backgroundColor: "white", p: 1, borderRadius: 2, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
+     
+        <Box sx={{ width: '100%', backgroundColor: "white", p: isDesktop ? 1 : 0, borderRadius: 2, boxShadow: "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px" }}>
           <Tabs value={value} onChange={handleChange} aria-label="subjects tabs">
             {courseContent.sections.map((section, index) =>
               <Tab key={index} label={section.section} {...a11yProps(index)} />
@@ -240,14 +246,13 @@ export default function BasicTabs() {
             <TabPanel key={index} value={value} index={index}>
               <Typography sx={{ fontWeight: 'bold' }} variant="p">Subjects</Typography>
   
-              <Grid my={2} container px={5}>
+              <Grid my={2} container px={isDesktop ? 5 : 0}>
                 {section.subject.map((subject, index) =>
                   <Grid key={index} item xs={12} md={12} lg={6}>
                     <FormControlLabel
                       disabled={subject.questions_length < 1 ? true : false}
                       label={subject.subject}
                       sx={{ color: "black" }}
-                      
                       control={<Checkbox value={subject.subject} onChange={handleSubjectCheckboxChange} />}
                     />
                     <Chip label={subject.questions_length} color="primary" variant="outlined" size="small" />
@@ -256,9 +261,8 @@ export default function BasicTabs() {
               </Grid>
               <Typography sx={{ fontWeight: 'bold' }} variant="p">System</Typography>
                 
-              <Grid container my={1} px={5}>
+              <Grid container my={1} px={isDesktop ? 5 : 0}>
               {section.subject.map((subject, index) => subject.system.map((system, index) => 
-     
                   <Grid key={index} item xs={12} md={12} lg={6}>
                      <Accordion sx={{ boxShadow: "none", my:0 }}>
                       <AccordionSummary
@@ -267,7 +271,7 @@ export default function BasicTabs() {
                         aria-controls="panel1a-content"
                         id="panel1a-header"
                       >
-                      <Box sx={{ display: "flex", alignItems: "center", columnGap: 3 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
                       <FormControlLabel
                         disabled={system.questions_length < 1 ? true : false || !checked.subjects.includes(subject.subject)}
                         label={system.system}
@@ -278,7 +282,7 @@ export default function BasicTabs() {
                       </AccordionSummary>
                       <AccordionDetails>
                         {system.topic.map((topic, index) =>
-                            <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
+                            <Box key={index} sx={{ display: "flex", alignItems: "center", px: 1 }}>
                               <FormControlLabel
                                 disabled={topic.questions_length < 1 || !checked.subjects.includes(subject.subject) ? true : false}
                                 label={topic.topicAttribute}
@@ -297,7 +301,7 @@ export default function BasicTabs() {
               </Grid>
 
               <Typography sx={{ fontWeight: 'bold' }} variant="p">Settings</Typography>
-              <Box sx={{ display: "flex", columnGap:3 }}>
+              <Box sx={{ display: "flex", columnGap:3, flexDirection: isDesktop ? "row" : "column" }}>
               <Box my={2} sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
                 <TextField
                   id="filled-basic"

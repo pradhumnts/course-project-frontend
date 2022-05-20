@@ -7,9 +7,11 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom'
+import useResponsive from '../hooks/useResponsive';
 
 export default function AlertDialog({ timeSpent, correct, incorrect, unanswerd }) {
   const [open, setOpen] = React.useState(true);
+  const isDesktop = useResponsive('up', 'sm');
 
   const handleClose = () => {
     setOpen(false);
@@ -28,7 +30,7 @@ export default function AlertDialog({ timeSpent, correct, incorrect, unanswerd }
           {"Test Results"}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" sx={{ width: "30vw", px: 3 }}>
+          <DialogContentText id="alert-dialog-description" sx={{ width: isDesktop ? "30vw" : "80vw", px: 3 }}>
            
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2}}>
                 <Typography sx={{ fontWeight: 'bold' }}>Time Spent </Typography>

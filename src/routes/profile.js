@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import NavBar from '../components/NavBar'
 import useAuth from '../hooks/useAuth';
-import { TextField } from '@mui/material'
+import { TextField, Button } from '@mui/material'
 
 const Profile = () => {
     const { user } = useAuth()
@@ -22,23 +22,6 @@ const Profile = () => {
     const emailInputHandler = (event) => {
         setEmail(event.target.value)
     }
-
-    // useEffect(() => {
-    //     const loadUser = async () => {
-    //         let fName = await user.first_name
-    //         let lName = await user.last_name
-    //         let email = await user.email
-    //         let username = await user.username
-
-    //         setFirstName(fName)
-    //         setLastName(lName)
-    //         setEmail(email)
-    //         setUsername(username)
-    //     }
-
-    //     loadUser()
-
-    // }, [user])
 
     return (
         <div>
@@ -118,7 +101,7 @@ const Profile = () => {
                                            
                                         </div>
                                         <div className="mt-3">
-                                            <button type="button" className="btn btn-sm btn-primary" id="save">Save</button>
+                                            <Button sx={{ mt:2 }} variant="contained">Save</Button>
                                         </div>
                                     </form>
                                 </div>   
@@ -133,7 +116,7 @@ const Profile = () => {
                                     </div>
                                     <div className="row">
                                         <div className="col-md-8">
-                                            <button type="button" className="btn btn-danger" id="delete" >Delete your account</button>
+                                        <Button sx={{ mt:2 }} color="error" variant="contained">Delete Account</Button>
                                         </div>
                                     </div>
                                  
