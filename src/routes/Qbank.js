@@ -93,7 +93,7 @@ export default function QBank() {
 
     let data;
     let secondsPerQuestion;
-
+    
     if(state === null){
         data = []
     }else{
@@ -197,17 +197,11 @@ export default function QBank() {
     };
 
     const finshTestHandler = () => {
-
+        
         !testComplete && setTimeSpent(secondToHms((data.length * state.secondsPerQuestion) - counter))
-        setShowResults(!showResults)
         setTestComplete(true)
+        setShowResults(prev => !prev)
         setShowSubmitButton(false)
-
-        if (answerValue === currentQuestion.correctAnswer) {
-            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: true}])
-        }else{
-            setAttemptedQuestions([...attemptedQuestions, {question: currentQuestion, answerCorrect: false}])
-        }
 
     }
 
@@ -302,8 +296,8 @@ export default function QBank() {
                     
                     <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 3 }}>          
                     {timeSpent < 3600 ? 
-                    <Typography variant="p" noWrap component="div">Total Time Spent: {timeSpent} </Typography>: 
-                    <Typography variant="p" noWrap component="div">Total Time Spent: {timeSpent} </Typography> }  
+                    <Typography variant="p" noWrap component="div">Time Spent: {timeSpent} </Typography>: 
+                    <Typography variant="p" noWrap component="div">Time Spent: {timeSpent} </Typography> }  
                     <Button variant="contained" size="medium" onClick={finshTestHandler}>See Results</Button>
                     </Box>
 
@@ -352,7 +346,9 @@ export default function QBank() {
             <Main open={open} drawerWidth={drawerWidth} isDesktop={isDesktop}>
                 <DrawerHeader />
                 {showResults && 
-                    <ResultDialog 
+                    <ResultDialog
+                        homepageLink={`/course/${state.course.id}`}
+                        setShowResults={setShowResults}
                         timeSpent={timeSpent}
                         correct={attemptedQuestions.filter(e => e.answerCorrect == true).length} 
                         incorrect={attemptedQuestions.filter(e => e.answerCorrect == false).length} 
@@ -376,7 +372,6 @@ export default function QBank() {
                             >
                                 {currentQuestion.answerChoiceList.map((answer, index) =>
                                     <div>
-                                    {attemptedQuestions.find(e => e.question === currentQuestion) && console.log()}
                                     {testComplete ? 
                                     <FormControlLabel key={index} value={answer.choiceNumber} control={<Radio disabled={true} />} label={stripHtml(answer.choice)} />
                                     :

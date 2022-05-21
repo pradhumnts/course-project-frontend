@@ -9,12 +9,13 @@ import { Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom'
 import useResponsive from '../hooks/useResponsive';
 
-export default function AlertDialog({ timeSpent, correct, incorrect, unanswerd }) {
+export default function AlertDialog({ setShowResults, timeSpent, correct, incorrect, unanswerd, homepageLink }) {
   const [open, setOpen] = React.useState(true);
   const isDesktop = useResponsive('up', 'sm');
 
   const handleClose = () => {
     setOpen(false);
+    setShowResults(prev => !prev)
   };
 
   return (
@@ -30,7 +31,7 @@ export default function AlertDialog({ timeSpent, correct, incorrect, unanswerd }
           {"Test Results"}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" sx={{ width: isDesktop ? "30vw" : "80vw", px: 3 }}>
+          <DialogContentText id="alert-dialog-description" sx={{ width: isDesktop ? "30vw" : "80vw", px: 3, mt:2 }}>
            
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2}}>
                 <Typography sx={{ fontWeight: 'bold' }}>Time Spent </Typography>
@@ -51,11 +52,14 @@ export default function AlertDialog({ timeSpent, correct, incorrect, unanswerd }
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Link to="/">
-            <Button onClick={handleClose} autoFocus>
+          <Link to={homepageLink}>
+            <Button>
               Go To Homepage
             </Button>
           </Link>
+            <Button autofocus onClick={handleClose} autoFocus>
+              See Results
+            </Button>
         </DialogActions>
       </Dialog>
     </div>

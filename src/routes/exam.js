@@ -62,7 +62,7 @@ function a11yProps(index) {
 
 export default function BasicTabs() {
   const isDesktop = useResponsive('up', 'sm');
-  
+
   const theme = useTheme()
 
   const { id } = useParams()
@@ -78,6 +78,7 @@ export default function BasicTabs() {
       try{
         const response = await axios.get("https://pradhumnts.pythonanywhere.com/courses/")
         const data = response.data
+  
         setCourseContent(data[0])
         setLoading(false)
 
@@ -171,7 +172,8 @@ export default function BasicTabs() {
     .then(function (response) {
       console.log(response)
       navigate("/course/1/qbank", { state: {
-        data: response.data, 
+        course: courseContent,
+        data: response.data,
         courseMode: courseMode,
         maxQuestions: maxQuestion,
         secondsPerQuestion: secondsPerQuestion
