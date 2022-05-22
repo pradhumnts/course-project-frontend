@@ -7,12 +7,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Link } from 'react-router-dom'
 
-export default function AlertDialog({ dialogOpen }) {
+export default function AlertDialog({ dialogOpen, finshTestHandler }) {
   const [open, setOpen] = React.useState(dialogOpen);
-
-    //   const handleClickOpen = () => {
-    //     setOpen(true);
-    //   };
 
   const handleClose = () => {
     setOpen(false);
@@ -35,7 +31,7 @@ export default function AlertDialog({ dialogOpen }) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>See results</Button>
+          <Button onClick={() => finshTestHandler(handleClose)}>See results</Button>
           <Link to="/">
           <Button onClick={handleClose}>
             Go to homepage

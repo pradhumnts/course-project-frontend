@@ -168,12 +168,11 @@ export default function BasicTabs() {
 
   const submitHandler = async () => {
 
-    axios.post('https://pradhumnts.pythonanywhere.com/courses/', checked)
+    axios.post('http://127.0.0.1:8000/courses/', checked)
     .then(function (response) {
-      console.log(response)
       navigate("/course/1/qbank", { state: {
         course: courseContent,
-        data: response.data,
+        data: response.data.slice(0, maxQuestion),
         courseMode: courseMode,
         maxQuestions: maxQuestion,
         secondsPerQuestion: secondsPerQuestion
