@@ -83,26 +83,36 @@ export default function BasicTabs() {
   const manageContent = (subject = []) => {
     let subs = [];
     let systems = [];
-
+    
     subject.map((sub) => {
-      sub.system.map((sys) => {
-        let topics = [];
-        sub.topics.map((topic) => {
+        sub.system.map((sys) => {
+            let topics = [];
+            sub.topics.map((topic) => {
           return topic.map((t, index) =>
-            topics.push({
-              id: t.id,
-              system_id: t.system_id,
-              subject_id: t.subject_id,
-              topic: t.topic,
-              topicAttribute: t.topicAttribute,
-              count: 0,
-              questions_length: sumArr(sub.questions_length
-                .filter((x) => x.topic === t.topic)
-                .map((x) => x.count)),
-              checked: false,
-            })
+          {
+                return topics.push({
+                  id: t.id,
+                  system_id: t.system_id,
+                  subject_id: t.subject_id,
+                  topic: t.topic,
+                  topicAttribute: t.topicAttribute,
+                  count: 0,
+                  questions_length: !!sub.questions_length.find(x => x.topic === t.topic && x.system_id === sys.id) ? sub.questions_length.find(x => x.topic === t.topic && x.system_id === sys.id).count : 0,
+                  checked: false,
+                })
+          }
           );
         });
+
+        topics = topics.filter(
+            (value, index, self) =>
+              index ===
+              self.findIndex(
+                (t) => t.id === value.id && t.subject_id === value.subject_id && t.system_id === value.system_id && t.topic === value.topic
+              )
+        )
+
+        console.log(topics)
 
         let res = topics.filter((t) => {
           return t.system_id === sys.id;
@@ -196,6 +206,7 @@ export default function BasicTabs() {
 
     setTopics(localTopics);
     setSystems(rs);
+    console.log(localTopics)
   };
 
   const updateCount = (subject, event) => {
@@ -211,7 +222,7 @@ export default function BasicTabs() {
 
     if (localSystems.length > 0) {
       localSystems.map((x) =>
-        x.topics.map((y) => {
+        topics.map((y) => {
           if (y.subject_id === subject.id && y.system_id === x.id) {
             co.push({
               topic: y.topic,
@@ -221,7 +232,7 @@ export default function BasicTabs() {
           }
         })
       );
-
+        
       let sys = [...systems];
 
       let result = [];
@@ -243,7 +254,6 @@ export default function BasicTabs() {
                 tempTopics.push(topic);
               });
 
-              console.log(tempTopics);
             } else {
               s.count -= sumArr(
                 co.filter((t) => t.system === s.system).map((x) => x.count)
@@ -254,6 +264,7 @@ export default function BasicTabs() {
           return s;
         });
       });
+      console.log(result)
       setSystems(result);
     }
   };
@@ -889,7 +900,7 @@ export default function BasicTabs() {
                               }}
                             >
                               <FormControlLabel
-                                disabled={false}
+                                disabled={topic.count <= 0}
                                 label={topic.topicAttribute}
                                 control={
                                   <Checkbox
