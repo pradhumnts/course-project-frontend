@@ -76,11 +76,14 @@ export default function BasicTabs() {
   const [topics, setTopics] = useState([]);
   const [systems, setSystems] = useState([]);
 
+  const [systemCount, setSystemCount] = useState([]);
+  const [topicCount, setTopicCount] = useState([]);
+
   const sumArr = (arr) => {
     return arr.reduce((partialSum, a) => partialSum + a, 0);
   };
 
-  const manageContent = (subject = []) => {
+  const manageContent = async (subject = []) => {
     let subs = [];
     let systems = [];
     
@@ -112,8 +115,6 @@ export default function BasicTabs() {
               )
         )
 
-        console.log(topics)
-
         let res = topics.filter((t) => {
           return t.system_id === sys.id;
         });
@@ -137,7 +138,7 @@ export default function BasicTabs() {
       });
     });
 
-    setSubjects(subs);
+    // setSubjects(subs);
 
     let tops = [];
     subs.map((x) => x.systems.map((y) => tops.push(Object.assign(y))));
@@ -175,6 +176,7 @@ export default function BasicTabs() {
     });
 
     let localTopics = [];
+
     rs.map((system) => {
       system.topics.map((topic) => {
         if (
@@ -206,73 +208,26 @@ export default function BasicTabs() {
 
     setTopics(localTopics);
     setSystems(rs);
-    console.log(localTopics)
-  };
 
-  const updateCount = (subject, event) => {
-    let co = [];
-    let subs = [...subjects];
-
-    let subIndex = subs.findIndex((s) => s.subject === subject.subject);
-    subs[subIndex].checked = true;
-
-    setSubjects(subs);
-
-    let localSystems = systems.filter((x) => x.subject_id === subject.id);
-
-    if (localSystems.length > 0) {
-      localSystems.map((x) =>
-        topics.map((y) => {
-          if (y.subject_id === subject.id && y.system_id === x.id) {
-            co.push({
-              topic: y.topic,
-              count: y.questions_length,
-              system: x.system,
-            });
-          }
-        })
-      );
+    const response = await axios.post("http://127.0.0.1:8000/get-questions-count/", subs.map(x => {
+                return {subject: x.subject, system: systems.map(x => x.system), topic: topics.map(x => x.topicAttribute)}
+        }))
         
-      let sys = [...systems];
+    // setting the subjects
+    let newSubs = subs.map(x => {
+        let subject = response.data.subjects.find(y => y.subject === x.subject)
+        x.count = subject.count
+        return x
+    })
 
-      let result = [];
-
-      localSystems.map((system) => {
-        result = sys.map((s) => {
-          if (s.system === system.system && s.subject_id === subject.id) {
-            if (event.target.checked) {
-              s.count = sumArr(
-                co.filter((t) => t.system === s.system).map((x) => x.count)
-              );
-
-              let tempTopics = [];
-
-              let tops = topics.filter((t) => t.system_id === s.id);
-
-              tops.map((topic) => {
-                topic.count = topic.questions_length;
-                tempTopics.push(topic);
-              });
-
-            } else {
-              s.count -= sumArr(
-                co.filter((t) => t.system === s.system).map((x) => x.count)
-              );
-            }
-            return s;
-          }
-          return s;
-        });
-      });
-      console.log(result)
-      setSystems(result);
-    }
+    setSubjects(newSubs)
   };
+
 
   useEffect(() => {
     const get_course_content = async () => {
       try {
-        const response = await axios.get("https://pradhumnts.pythonanywhere.com/courses/");
+        const response = await axios.get("http://127.0.0.1:8000/courses/");
         const data = response.data;
         setCourseContent(data[0]);
         setLoading(false);
@@ -310,8 +265,6 @@ export default function BasicTabs() {
     subs[subIndex].checked = event.target.checked;
 
     setSubjects(subs);
-
-    updateCount(subject, event);
 
     if (event.target.checked) {
       setChecked({
@@ -688,9 +641,60 @@ export default function BasicTabs() {
     updated_at: "2022-05-03T03:19:35.859144Z",
   };
 
+  const getQuestionCount = async () => {
+
+    let data = checked.subjects.map(x => {
+        return {subject: x, system: systems.map(x => x.system), topic: topics.map(x => x.topicAttribute)}
+    })
+
+    const res = await axios.post("http://127.0.0.1:8000/get-questions-count/", data)
+    console.log(res)
+    // setting the subject count  
+    let sys = [...systems]
+    let tops = [...topics]
+    let resSystems = []
+    let resTopics = []
+
+    res.data.systems.map(x => {
+        if(resSystems.findIndex(y => y.system === x.system) === -1){
+            resSystems.push(x)
+        }else{
+            let ele = resSystems.findIndex(y => y.system === x.system)
+            resSystems[ele].count += x.count
+        }
+    })
+
+    res.data.topics.map(x => {
+        if(resTopics.findIndex(y => y.topic === x.topicAttribute && y.system_id === x.system_id) === -1){
+            resTopics.push(x)
+        }else{
+            let ele = resTopics.findIndex(y => y.topic === x.topicAttribute && y.system_id === x.system_id)
+            resTopics[ele].count += x.count
+        }
+    })
+  
+    let newTop = tops.map(x => {
+        let topic = resTopics.find(y => y.topic === x.topicAttribute && y.system_id === x.system_id)
+        console.log(resTopics, x)
+        x.count = topic.count
+        return x
+    })
+
+    let newSys = sys.map(x => {
+        let system = resSystems.find(y => y.system === x.system)
+        x.count = system.count
+        return x
+    })
+
+    setSystems(newSys)
+    setTopics(newTop)
+
+
+  }
+
   const submitHandler = async () => {
     axios
-      .post("https://pradhumnts.pythonanywhere.com/courses/", checked)
+      .post("http://127.0.0.1:8000/courses/", checked)
       .then(function (response) {
         navigate("/course/1/qbank", {
           state: {
@@ -795,6 +799,7 @@ export default function BasicTabs() {
                 />
               </RadioGroup>
             </FormControl>
+            <Button variant="contained" onClick={getQuestionCount}>Get Count!</Button>
           </CardContent>
         </Card>
 
