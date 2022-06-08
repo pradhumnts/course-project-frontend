@@ -34,7 +34,7 @@ const Login = () => {
         if(!!state){
             setErrors([...errors, state])
         }
-    }, [state])
+    }, [state, errors])
 
     const usernameInputHandler = (event) => {
         setEnteredUsername(event.target.value)
@@ -46,7 +46,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault()
 
-        if (enteredUsername == ""){
+        if (enteredUsername === ""){
             setUsernameError(true)
             setUsernameErrorMsg("Username can not be empty!")
         }

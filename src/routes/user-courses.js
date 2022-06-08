@@ -28,7 +28,7 @@ const UserCourses = () => {
    
             if (accessToken) {
                 try{
-                    const response = await axios.get('https://pradhumnts.pythonanywhere.com/users-courses/', {
+                    const response = await axios.get('http://127.0.0.1:8000/users-courses/', {
                         headers: {
                             Authorization: `JWT ${accessToken}`,
                         }

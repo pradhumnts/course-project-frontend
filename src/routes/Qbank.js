@@ -21,7 +21,6 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import stripHtml from "../utils/stripHtml";
 import secondToHms from "../utils/secondsToHms";
 import TimeDialog from "../components/TimeDialog";
@@ -36,7 +35,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme, open, drawerWidth, isDesktop }) => ({
+  ({ theme, open, drawerwidth, isdesktop }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create("margin", {
@@ -46,7 +45,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
     backgroundColor: "rgba(25, 118, 210, 0.08)",
     minHeight: "100vh",
     height: "100%",
-    marginLeft: isDesktop ? `-${drawerWidth}px` : `-${drawerWidth}`,
+    marginLeft: isdesktop ? `-${drawerwidth}px` : `-${drawerwidth}`,
     ...(open && {
       transition: theme.transitions.create("margin", {
         easing: theme.transitions.easing.easeOut,
@@ -59,14 +58,14 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open, drawerWidth }) => ({
+})(({ theme, open, drawerwidth }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}`,
+    width: `calc(100% - ${drawerwidth}px)`,
+    marginLeft: `${drawerwidth}`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -88,7 +87,7 @@ export default function QBank() {
 
   const isDesktop = useResponsive("up", "sm");
 
-  const drawerWidth = isDesktop ? 240 : "100%";
+  const drawerwidth = isDesktop ? 240 : "100%";
 
   const { state } = useLocation();
 
@@ -108,10 +107,10 @@ export default function QBank() {
 
   const [open, setOpen] = useState(isDesktop ? true : false);
   const [currentQuestion, setCurrentQuestion] = useState(
-    data == "" ? "" : data[0]
+    data === "" ? "" : data[0]
   );
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [answerValue, setAnswerValue] = useState("");
+
   const [showSubmitButton, setShowSubmitButton] = useState(true);
   const [attemptedQuestions, setAttemptedQuestions] = useState([]);
   const [counter, setCounter] = useState(
@@ -122,10 +121,6 @@ export default function QBank() {
   const [loading, setLoading] = useState(true);
   const [timeSpent, setTimeSpent] = useState(counter);
   const [testComplete, setTestComplete] = useState(false);
-
-  const handleRadioChange = (event) => {
-    setAnswerValue(event.target.value);
-  };
 
   React.useEffect(() => {}, [attemptedQuestions]);
 
@@ -211,7 +206,6 @@ export default function QBank() {
       ]);
     }
 
-    setAnswerValue(null);
   };
 
   const handleDrawerOpen = () => {
@@ -272,7 +266,7 @@ export default function QBank() {
         <TimeDialog finshTestHandler={finshTestHandler} dialogOpen={true} />
       )}
 
-      <AppBar position="fixed" open={open} drawerWidth={drawerWidth}>
+      <AppBar position="fixed" open={open} drawerwidth={drawerwidth}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
@@ -368,7 +362,7 @@ export default function QBank() {
         color="primary"
         sx={{ top: "auto", bottom: 0 }}
         open={open}
-        drawerWidth={drawerWidth}
+        drawerwidth={drawerwidth}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "center" }}>
           <Box
@@ -435,10 +429,10 @@ export default function QBank() {
       </AppBar>
       <Drawer
         sx={{
-          width: drawerWidth,
+          width: drawerwidth,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
+            width: drawerwidth,
             boxSizing: "border-box",
           },
         }}
@@ -472,7 +466,7 @@ export default function QBank() {
         </List>
       </Drawer>
 
-      <Main open={open} drawerWidth={drawerWidth} isDesktop={isDesktop}>
+      <Main open={open} drawerwidth={drawerwidth} isdesktop={isDesktop ? 1 : 0}>
         <DrawerHeader />
         {showResults && (
           <ResultDialog
@@ -480,10 +474,10 @@ export default function QBank() {
             setShowResults={setShowResults}
             timeSpent={timeSpent}
             correct={
-              attemptedQuestions.filter((e) => e.answerCorrect == true).length
+              attemptedQuestions.filter((e) => e.answerCorrect === true).length
             }
             incorrect={
-              attemptedQuestions.filter((e) => e.answerCorrect == false).length
+              attemptedQuestions.filter((e) => e.answerCorrect === false).length
             }
             unanswerd={data.length - attemptedQuestions.length}
           />
@@ -517,7 +511,7 @@ export default function QBank() {
                   value=" "
                 >
                   {currentQuestion.answerChoiceList.map((answer, index) => (
-                    <div>
+                    <div key={index}>
                         {!testComplete && <div>
                             {attemptedQuestions.find(
                           (ele) => ele.question === currentQuestion

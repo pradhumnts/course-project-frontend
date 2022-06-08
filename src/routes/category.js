@@ -29,7 +29,7 @@ const Categories = () => {
                                 </span>
                             </div>
                             <div className="media-body">
-                                <a href="support-topic.html" className="h6 stretched-link mb-0">Which license do I need?</a>
+                                <p className="h6 stretched-link mb-0">Which license do I need?</p>
                             </div>
                         </div>
                     </div>
@@ -39,14 +39,14 @@ const Categories = () => {
                         
                         <div className="row align-items-center">
                             <div className="col">
-                                <a href="#" className="stretched-link">
+                                <p className="stretched-link">
                                     <i data-feather="edit-3"></i><span className="h6 text-sm ml-3">5 questions</span>
-                                </a>
+                                </p>
                             </div>
                             <div className="col-auto">
-                                <a href="#" className="stretched-link">
+                                <p className="stretched-link">
                                     <i data-feather="clock"></i><span className="h6 text-sm ml-3">course name</span>
-                                </a>
+                                </p>
                             </div>
                         </div>
                     </div>

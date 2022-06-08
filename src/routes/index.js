@@ -74,12 +74,12 @@ const Index = () => {
                                 <p className="mt-2 mb-0 lh-170">{course.description}</p>
                                <Link to="/payment"><Button variant="outlined" sx={{ mt:2, width: "100%" }}>Enroll Now</Button></Link>
                             </div>
-                            <div class="card-footer border-0 delimiter-top">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span class="text-sm mb-0 avatar-content">27 Jan, 2022</span>
+                            <div className="card-footer border-0 delimiter-top">
+                                    <div className="row align-items-center">
+                                        <div className="col-auto">
+                                            <span className="text-sm mb-0 avatar-content">27 Jan, 2022</span>
                                         </div>
-                                        <div class="col text-right text-right">
+                                        <div className="col text-right text-right">
                                             <FileDownloadOutlinedIcon sx={{ mr:.6, width: 20 }} />
                                             <span>350</span>
                                         </div>

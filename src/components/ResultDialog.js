@@ -57,7 +57,7 @@ export default function AlertDialog({ setShowResults, timeSpent, correct, incorr
               Go To Homepage
             </Button>
           </Link>
-          <Button autofocus onClick={handleClose} autoFocus>
+          <Button onClick={handleClose} autoFocus>
             Close
           </Button>
         </DialogActions>
