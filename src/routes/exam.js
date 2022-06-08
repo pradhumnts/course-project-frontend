@@ -218,7 +218,7 @@ export default function BasicTabs() {
       setTopics(localTopics);
       setSystems(rs);
   
-      const response = await axios.post("http://127.0.0.1:8000/get-questions-count/", subs.map(x => {
+      const response = await axios.post("https://pradhumnts.pythonanywhere.com/get-questions-count/", subs.map(x => {
                   return {subject: x.subject, system: systems.map(x => x.system), topic: topics.map(x => x.topicAttribute)}
           }))
           
@@ -241,7 +241,7 @@ export default function BasicTabs() {
   useEffect(() => {
     const get_course_content = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/courses/");
+        const response = await axios.get("https://pradhumnts.pythonanywhere.com/courses/");
         const data = response.data;
         setCourseContent(data[0]);
         setLoading(false);
@@ -269,7 +269,7 @@ export default function BasicTabs() {
           return {subject: x, system: systems.map(x => x.system), topic: topics.map(x => x.topicAttribute)}
       })
       
-      const res = await axios.post("http://127.0.0.1:8000/get-questions-count/", data)
+      const res = await axios.post("https://pradhumnts.pythonanywhere.com/get-questions-count/", data)
   
         let sys = [...systems]
         let tops = [...topics]
@@ -443,7 +443,7 @@ export default function BasicTabs() {
 
   const submitHandler = async () => {
     axios
-    .post("http://127.0.0.1:8000/courses/", checked)
+    .post("https://pradhumnts.pythonanywhere.com/courses/", checked)
     .then(function (response) {
         navigate("/course/1/qbank", {
           state: {
