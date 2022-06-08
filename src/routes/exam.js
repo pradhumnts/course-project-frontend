@@ -12,7 +12,6 @@ import NavBar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -25,6 +24,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControl from "@mui/material/FormControl";
 import useResponsive from "../hooks/useResponsive";
 import { useTheme } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -76,6 +76,7 @@ export default function BasicTabs() {
   const [subjects, setSubjects] = useState([]);
   const [topics, setTopics] = useState([]);
   const [systems, setSystems] = useState([]);
+  const [examButtonLoading, setExamButtonLoading] = useState(false);
 
   const sumArr = (arr) => {
     return arr.reduce((partialSum, a) => partialSum + a, 0);
@@ -231,7 +232,6 @@ export default function BasicTabs() {
   
       setSubjects(newSubs)
     };
-
     if (!!courseContent.courseName) {
       manageContent(courseContent["sections"][0]["subject"]);
     }
@@ -259,8 +259,6 @@ export default function BasicTabs() {
   });
 
   const [value, setValue] = useState(0);
-
-  
 
   useEffect(() => { 
     const getQuestionCount = async () => {
@@ -313,7 +311,7 @@ export default function BasicTabs() {
   
           setSystems(newSys)
           setTopics(newTop)     
-        
+          
         }else{
           let newTop = tops.map(x => {
             x.count = 0
@@ -327,6 +325,7 @@ export default function BasicTabs() {
   
           setSystems(newSys)
           setTopics(newTop) 
+
         }
   
     }
@@ -442,9 +441,11 @@ export default function BasicTabs() {
   };
 
   const submitHandler = async () => {
+    setExamButtonLoading(true)
     axios
     .post("https://pradhumnts.pythonanywhere.com/courses/", checked)
     .then(function (response) {
+        setExamButtonLoading(false)
         navigate("/course/1/qbank", {
           state: {
             course: courseContent,
@@ -592,6 +593,7 @@ export default function BasicTabs() {
                         />
                       }
                     />
+                   
                     <Chip
                       label={subject.count}
                       color="primary"
@@ -726,14 +728,15 @@ export default function BasicTabs() {
                   <Typography variant="span">(Max: 360 seconds)</Typography>
                 </Box>
               </Box>
-              <Button
+              <LoadingButton
+                loading={examButtonLoading}
                 sx={{ mt: 3 }}
                 variant="contained"
                 disabled={checked.topics.length < 1}
                 onClick={submitHandler}
               >
                 Generate Test
-              </Button>
+              </LoadingButton>
             </TabPanel>
           ))}
         </Box>
