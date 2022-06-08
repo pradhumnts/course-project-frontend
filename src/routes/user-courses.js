@@ -35,8 +35,9 @@ const UserCourses = () => {
                     })
                     setCourses(response.data)
                 }catch(err){
-                    console.log(err)
                     logout()
+                    window.localStorage.removeItem('accessToken')
+                    
                     if(err.response.status === 401){
                         navigate("/login", {state: "Please login to your account to continue!"})
                     }
