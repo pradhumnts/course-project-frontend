@@ -234,6 +234,9 @@ export default function BasicTabs() {
     };
     if (!!courseContent.courseName) {
       manageContent(courseContent["sections"][0]["subject"]);
+      if(subjects.length <= 0){
+        manageContent(courseContent["sections"][0]["subject"]);
+      }
     }
     // eslint-disable-next-line
   }, [courseContent]);
@@ -300,7 +303,7 @@ export default function BasicTabs() {
               }
               return x
           })
-  
+
           let newSys = sys.map(x => {
               let system = resSystems.find(y => y.system === x.system)
               if(!!system){
@@ -503,6 +506,81 @@ export default function BasicTabs() {
     setSecondsPerQuestion(event.target.value);
   };
 
+  const handleSubjectsSelect = (event) => {
+    
+    if (event.target.checked){
+      let subs = subjects.map(subject => {
+        subject.checked = true;
+        return subject
+      })
+
+      setSubjects(subs)
+
+      setChecked({
+        subjects: [...subjects.map(x => x.subject)],
+        system: [...checked.system],
+        topics: [...checked.topics],
+      });
+
+    }else if(!event.target.checked){
+      let subs = subjects.map(subject => {
+        subject.checked = false;
+        return subject
+      })
+
+      setSubjects(subs)
+      setChecked({
+        subjects: [],
+        system: [...checked.system],
+        topics: [...checked.topics],
+      });
+    }
+
+  }
+
+  const handleSystemsSelect = (event) => {
+    if (event.target.checked){
+      let subs = systems.map(system => {
+        system.checked = true;
+        return system
+      })
+
+      setSystems(subs)
+
+      let tops = topics.map(topic => {
+        topic.checked = true;
+        return topic
+      })
+
+      setTopics(tops)
+
+      setChecked({
+        subjects: [...checked.subjects],
+        system: [...systems.map(x => x.system)],
+        topics: [...topics.map(x => x.topic)],
+      });
+
+    }else if(!event.target.checked){
+      let subs = systems.map(system => {
+        system.checked = false;
+        return system
+      })
+
+      setSystems(subs)
+      setChecked({
+        subjects: [...checked.subjects],
+        system: [],
+        topics: [],
+      });
+
+      let tops = topics.map(topic => {
+        topic.checked = false;
+        return topic
+      })
+      setTopics(tops)
+    }
+  }
+
   return (
     <Box>
       <NavBar />
@@ -573,6 +651,7 @@ export default function BasicTabs() {
           </Tabs>
           {courseContent.sections.map((section, index) => (
             <TabPanel key={index} value={value} index={index}>
+              <Checkbox onChange={handleSubjectsSelect}/>
               <Typography sx={{ fontWeight: "bold" }} variant="p">
                 Subjects
               </Typography>
@@ -603,6 +682,7 @@ export default function BasicTabs() {
                   </Grid>
                 ))}
               </Grid>
+              <Checkbox onChange={handleSystemsSelect}/>
               <Typography sx={{ fontWeight: "bold" }} variant="p">
                 System
               </Typography>
@@ -732,7 +812,7 @@ export default function BasicTabs() {
                 loading={examButtonLoading}
                 sx={{ mt: 3 }}
                 variant="contained"
-                disabled={checked.topics.length < 1}
+                disabled={checked.subjects.length < 1 || checked.topics.length < 1}
                 onClick={submitHandler}
               >
                 Generate Test

@@ -178,33 +178,51 @@ export default function QBank() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
     setShowSubmitButton(false);
-    if (parseInt(event.target.value) === currentQuestion.correctAnswer) {
-      setAttemptedQuestions([
-        ...attemptedQuestions,
-        {
-          question: currentQuestion,
-          answerCorrect: true,
-          answerChoice:
-            currentQuestion.answerChoiceList[parseInt(event.target.value) - 1]
-              .choice,
-          answerIndex: parseInt(event.target.value),
-        },
-      ]);
-    } else {
-      setAttemptedQuestions([
-        ...attemptedQuestions,
-        {
-          question: currentQuestion,
-          answerCorrect: false,
-          answerChoice:
-            currentQuestion.answerChoiceList[parseInt(event.target.value) - 1]
-              .choice,
-          answerIndex: parseInt(event.target.value),
-        },
-      ]);
+    
+    function searchElement(arr, element) {
+      const found = arr.some(el => el.question.question === element);
+      return found;
     }
+
+    if(searchElement(attemptedQuestions, currentQuestion.question)){
+      let arr = [...attemptedQuestions]
+      let ele = arr.findIndex(q => q.question.question === currentQuestion.question)
+      arr[ele].answerChoice = currentQuestion.answerChoiceList[parseInt(event.target.value) - 1].choice
+      arr[ele].answerIndex = parseInt(event.target.value)
+      if(parseInt(event.target.value) === currentQuestion.correctAnswer){
+        arr[ele].answerCorrect = true 
+      }else{
+        arr[ele].answerCorrect = false
+      }
+      setAttemptedQuestions(arr)
+
+    }else{
+      if (parseInt(event.target.value) === currentQuestion.correctAnswer) {
+        setAttemptedQuestions([
+          ...attemptedQuestions,
+          {
+            question: currentQuestion,
+            answerCorrect: true,
+            answerChoice:
+              currentQuestion.answerChoiceList[parseInt(event.target.value) - 1]
+                .choice,
+            answerIndex: parseInt(event.target.value),
+          },
+        ]);
+      } else {
+        setAttemptedQuestions([
+          ...attemptedQuestions,
+          {
+            question: currentQuestion,
+            answerCorrect: false,
+            answerChoice: currentQuestion.answerChoiceList[parseInt(event.target.value) - 1].choice,
+            answerIndex: parseInt(event.target.value),
+          },
+        ]);
+      }
+    }
+
 
   };
 
@@ -263,7 +281,10 @@ export default function QBank() {
       <CssBaseline />
 
       {openDialog && (
-        <TimeDialog finshTestHandler={finshTestHandler} dialogOpen={true} />
+        <TimeDialog setSelectedIndex={setSelectedIndex}
+        selectQuestion={selectQuestion} 
+        finshTestHandler={finshTestHandler} 
+        dialogOpen={true} />
       )}
 
       <AppBar position="fixed" open={open} drawerwidth={drawerwidth}>
@@ -377,6 +398,7 @@ export default function QBank() {
               variant="contained"
               onClick={(event) => handleListItemClick(event, selectedIndex - 1)}
               size="large"
+              disabled={selectedIndex === 0}
               startIcon={<ChevronLeftIcon fontSize="large" />}
             >
               Prev
@@ -388,6 +410,7 @@ export default function QBank() {
               size="large"
               onClick={(event) => handleListItemClick(event, selectedIndex + 1)}
               endIcon={<ChevronRightIcon fontSize="large" />}
+              disabled={selectedIndex === data.length - 1}
             >
               Next
             </Button>
@@ -470,6 +493,9 @@ export default function QBank() {
         <DrawerHeader />
         {showResults && (
           <ResultDialog
+            finshTestHandler={finshTestHandler}
+            setSelectedIndex={setSelectedIndex}
+            selectQuestion={selectQuestion}
             homepageLink={`/course/${state.course.id}`}
             setShowResults={setShowResults}
             timeSpent={timeSpent}
@@ -530,7 +556,7 @@ export default function QBank() {
                           onChange={handleSubmit}
                           control={
                             <Radio
-                              disabled={true}
+                              // disabled={true}
                               checked={answer.choice === attemptedQuestions.find(e => e.question === currentQuestion).answerChoice}
                             />
                           }
