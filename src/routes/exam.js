@@ -77,12 +77,11 @@ export default function BasicTabs() {
   const [topics, setTopics] = useState([]);
   const [systems, setSystems] = useState([]);
   const [examButtonLoading, setExamButtonLoading] = useState(false);
+  const [selectedQuestionCount, setSelectedQuestionCount] = useState(0)
 
   const sumArr = (arr) => {
     return arr.reduce((partialSum, a) => partialSum + a, 0);
   };
-
- 
 
   useEffect(() => {
     const manageContent = async (subject = []) => {
@@ -333,9 +332,22 @@ export default function BasicTabs() {
   
     }
 
-    getQuestionCount() 
+    getQuestionCount()
     // eslint-disable-next-line
   }, [checked]);
+
+  const countSelectedQuestions = (tops) => {
+    
+    let sub = tops.map(x =>
+      topics.find(y => y.topicAttribute === x).count
+    )
+    
+    if (sumArr(sub) > 40) {
+      setSelectedQuestionCount(40)
+    }else{
+      setSelectedQuestionCount(sumArr(sub))
+    }
+  }
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -365,7 +377,11 @@ export default function BasicTabs() {
         topics: [...checked.topics],
       });
     }
-
+    let sub = checked.system.map(x =>
+      systems.find(y => y.system === x).count
+    )
+    
+    setSelectedQuestionCount(sumArr(sub)) 
   };
 
   const handleSystemCheckboxChange = (event) => {
@@ -374,6 +390,10 @@ export default function BasicTabs() {
     let tops = [...systems];
 
     let system = tops.find((t) => t.system === event.target.value);
+
+    if(event.target.checked){
+      setSelectedQuestionCount(selectedQuestionCount + system.count)
+    }
 
     let sysIndex = tops.findIndex((s) => s.system === system.system);
     tops[sysIndex].checked = event.target.checked;
@@ -393,7 +413,6 @@ export default function BasicTabs() {
         selectedSystem = tops.topics.map((x) => x.topicAttribute);
       }
     });
-
     if (event.target.checked) {
       setChecked({
         subjects: [...checked.subjects],
@@ -407,6 +426,9 @@ export default function BasicTabs() {
         topics: [...checked.topics],
       });
     }
+    
+    maxQuestionsHandler(selectedQuestionCount)
+    
   };
 
   const handleTopicCheckboxChange = (topic, event, sys) => {
@@ -427,7 +449,7 @@ export default function BasicTabs() {
     tops[sysIndex].topics = ts;
 
     setSystems(tops);
-
+    
     if (event.target.checked) {
       setChecked({
         subjects: [...checked.subjects],
@@ -441,8 +463,13 @@ export default function BasicTabs() {
         topics: checked.topics.filter((item) => item !== event.target.value),
       });
     }
-  };
 
+    maxQuestionsHandler(selectedQuestionCount)
+    
+    countSelectedQuestions([...checked.topics, event.target.value])
+    
+  }
+  
   const submitHandler = async () => {
     setExamButtonLoading(true)
     axios
@@ -488,13 +515,16 @@ export default function BasicTabs() {
     );
   }
 
-  const maxQuestionsHandler = (event) => {
-    if (event.target.value < 0) {
-      event.target.value = 0;
-    } else if (event.target.value > 40) {
-      event.target.value = 40;
+  const maxQuestionsHandler = (count) => {
+
+    if (count < 0) {
+      count = 0;
     }
-    setMaxQuestion(event.target.value);
+    else if (count > 40) {
+      count = 40;
+    }
+  
+    setMaxQuestion(count);
   };
 
   const secondsPerQuestionHandler = (event) => {
@@ -557,7 +587,7 @@ export default function BasicTabs() {
       setChecked({
         subjects: [...checked.subjects],
         system: [...systems.map(x => x.system)],
-        topics: [...topics.map(x => x.topic)],
+        topics: [...topics.map(x => x.topicAttribute)],
       });
 
     }else if(!event.target.checked){
@@ -567,6 +597,7 @@ export default function BasicTabs() {
       })
 
       setSystems(subs)
+
       setChecked({
         subjects: [...checked.subjects],
         system: [],
@@ -579,8 +610,10 @@ export default function BasicTabs() {
       })
       setTopics(tops)
     }
+    
+    setSelectedQuestionCount(sumArr(systems.map(system => system.count)))
   }
-
+  
   return (
     <Box>
       <NavBar />
@@ -780,14 +813,14 @@ export default function BasicTabs() {
                     variant="filled"
                     label="Number Of Questions"
                     type="number"
-                    defaultValue={40}
+                    value={selectedQuestionCount}
                     required={true}
-                    onChange={(event) => maxQuestionsHandler(event)}
+                    onChange={(event) => maxQuestionsHandler(selectedQuestionCount)}
                     InputLabelProps={{
                       shrink: true,
                     }}
                   />
-                  <Typography variant="span">(Max: 40 questions)</Typography>
+                  <Typography variant="span">(Max: {selectedQuestionCount} questions)</Typography>
                 </Box>
                 <Box
                   my={2}

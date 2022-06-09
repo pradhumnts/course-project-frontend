@@ -181,13 +181,13 @@ export default function QBank() {
     setShowSubmitButton(false);
     
     function searchElement(arr, element) {
-      const found = arr.some(el => el.question.question === element);
+      const found = arr.some(el => el.question.questionText === element);
       return found;
     }
 
-    if(searchElement(attemptedQuestions, currentQuestion.question)){
+    if(searchElement(attemptedQuestions, currentQuestion.questionText)){
       let arr = [...attemptedQuestions]
-      let ele = arr.findIndex(q => q.question.question === currentQuestion.question)
+      let ele = arr.findIndex(q => q.question.questionText === currentQuestion.questionText)
       arr[ele].answerChoice = currentQuestion.answerChoiceList[parseInt(event.target.value) - 1].choice
       arr[ele].answerIndex = parseInt(event.target.value)
       if(parseInt(event.target.value) === currentQuestion.correctAnswer){
@@ -199,6 +199,7 @@ export default function QBank() {
 
     }else{
       if (parseInt(event.target.value) === currentQuestion.correctAnswer) {
+       
         setAttemptedQuestions([
           ...attemptedQuestions,
           {

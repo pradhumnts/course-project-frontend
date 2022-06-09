@@ -72,7 +72,7 @@ const Index = () => {
                                 <small className="d-block text-sm mb-2">{course.createdAt}</small>
                                 <Typography variant="h4">{course.name}</Typography>
                                 <p className="mt-2 mb-0 lh-170">{course.description}</p>
-                               <Link to="/payment"><Button variant="outlined" sx={{ mt:2, width: "100%" }}>Enroll Now</Button></Link>
+                               <Link to="/payment"><Button variant="outlined" sx={{ mt:2, width: "100%" }}>Get Access Now</Button></Link>
                             </div>
                             <div className="card-footer border-0 delimiter-top">
                                     <div className="row align-items-center">
